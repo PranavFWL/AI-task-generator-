@@ -177,7 +177,7 @@ npm install @google/generative-ai dotenv
 **Solution**: Check the `.env` file:
 ```bash
 cat .env
-# Ensure GEMINI_API_KEY=***REMOVED_API_KEY***
+# Ensure GEMINI_API_KEY is set to your actual API key from Google AI Studio
 ```
 
 ### **Issue: Permission Errors**

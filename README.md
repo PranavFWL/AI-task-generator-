@@ -46,10 +46,16 @@ cd AgentTask-AI
 npm install
 ```
 
-3. Create a `.env` file in the root directory:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
+3. Configure environment variables:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env and add your Gemini API key
+# Get your API key from: https://aistudio.google.com/app/apikey
 ```
+
+**IMPORTANT**: Never commit your `.env` file to version control. It's already listed in `.gitignore`.
 
 4. Build the project:
 ```bash
@@ -198,7 +204,22 @@ console.log('AI Insights:', execution.aiInsights);
 
 ### Environment Variables
 
+Create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
 - `GEMINI_API_KEY`: Your Google Gemini API key (required for AI mode)
+  - Get your key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+  - **Never commit this key to version control**
+  - The `.env` file is automatically ignored by git
+
+Optional variables:
+- `PORT`: Server port (default: 3001)
+- `NODE_ENV`: Environment mode (development/production)
+- `JWT_SECRET`: Secret key for JWT tokens
 
 ### AI Mode Toggle
 

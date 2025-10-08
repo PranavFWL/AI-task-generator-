@@ -6,7 +6,7 @@
 - **GeminiService.ts**: Complete Google Gemini AI integration
 - **MockGeminiService.ts**: Fallback implementation for when dependencies aren't available
 - **Smart Fallback**: Automatic detection and graceful degradation
-- **API Key Ready**: Your Gemini API key (***REMOVED_API_KEY***) is configured
+- **API Key Ready**: Gemini API key is configured in `.env` file
 
 ### 🧠 **AI-Powered Agents**
 - **AICoordinatorAgent**: Uses Gemini for intelligent project breakdown
@@ -110,7 +110,7 @@ Your enhanced system now:
 
 ## 🤖 **AI Integration Status**
 
-- **Gemini API Key**: ✅ Configured (***REMOVED_API_KEY***)
+- **Gemini API Key**: ✅ Configured in `.env` file (see `.env.example` for setup)
 - **Service Layer**: ✅ Complete with fallback
 - **Agent Integration**: ✅ All agents AI-enhanced
 - **System Mode**: ✅ Dual-mode (AI + fallback)
