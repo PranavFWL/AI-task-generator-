@@ -166,10 +166,7 @@ Analyzes a project description and returns structured tasks.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
 
-MIT
 
-## Author
 
-Built with Claude Code
+
