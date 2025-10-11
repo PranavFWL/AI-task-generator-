@@ -1,64 +1,31 @@
 {
-  "name": "ai-agent-task-manager",
-  "version": "1.0.0",
-  "description": "AI Agent system for translating project briefs into technical tasks with specialized sub-agents",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "name": "webapp",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "dev:watch": "nodemon --exec ts-node src/index.ts",
-    "example:basic": "ts-node examples/basic-usage.ts",
-    "example:custom": "ts-node examples/custom-agents.ts",
-    "example:ai": "ts-node examples/ai-powered-usage.ts",
-    "test": "echo \"Tests will be implemented\" && exit 0",
-    "lint": "echo \"Linting will be implemented\" && exit 0",
-    "clean": "rm -rf dist"
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "keywords": [
-    "ai",
-    "agent",
-    "task-management",
-    "code-generation",
-    "project-brief",
-    "nodejs",
-    "typescript",
-    "react",
-    "express",
-    "automation"
-  ],
-  "author": "AI Agent System",
-  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.7.1",
-    "bcrypt": "^5.1.0",
-    "cors": "^2.8.5",
+    "ai-agent-task-manager": "file:..",
     "dotenv": "^16.6.1",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2"
+    "lucide-react": "^0.545.0",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
-    "@types/cors": "^2.8.13",
-    "@types/express": "^4.17.17",
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/node": "^20.4.5",
-    "nodemon": "^3.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-repo/ai-agent-task-manager.git"
-  },
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
