@@ -1,6 +1,6 @@
-# AgentTask AI - Web Application
+# AgentTask-AI - AI-Powered Project Task Breakdown System
 
-A modern web interface for the AI Agent Task Management System that breaks down project descriptions into actionable technical tasks using Google Gemini AI.
+A modern web application that intelligently breaks down project descriptions into actionable technical tasks using Google Gemini AI and a multi-agent system.
 
 ## Features
 
@@ -15,88 +15,84 @@ A modern web interface for the AI Agent Task Management System that breaks down 
   - Acceptance criteria with checkboxes
 - 🎨 **Modern UI** - Built with Next.js 15, React 19, and Tailwind CSS 4
 - ⚡ **Real-time Processing** - Instant feedback and results
+- 🔄 **Multi-Agent System** - Coordinator, Frontend, and Backend agents work together
 
 ## Prerequisites
 
-1. Node.js 16+ installed
-2. GEMINI_API_KEY configured in parent `.env` file (`/home/pranav/Software_Lab/.env`)
+- Node.js 18+ installed
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
 
-## Installation
+## Quick Start
 
-The webapp is already configured and dependencies are installed. If you need to reinstall:
-
-```bash
-cd /home/pranav/Software_Lab/webapp
-npm install
-```
-
-## Running the Application
-
-### Development Mode
-
-```bash
-cd /home/pranav/Software_Lab/webapp
-npm run dev
-```
-
-The application will be available at:
-- Local: http://localhost:3000
-- Network: http://[your-ip]:3000
-
-### Production Build
-
-```bash
-cd /home/pranav/Software_Lab/webapp
-npm run build
-npm start
-```
-
-## How to Use
-
-1. **Start the server** using `npm run dev`
-2. **Open your browser** to http://localhost:3000
-3. **Enter a project description** in the text area, for example:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/PranavFWL/AI-task-generator-.git
+   cd AI-task-generator-
    ```
-   Create a todo app with user authentication, real-time updates,
-   and mobile responsive design
+
+2. **Install dependencies**
+   ```bash
+   npm install
    ```
-4. **Click "Analyze Project"**
-5. **View the results**:
-   - AI Analysis summary
-   - Detailed task cards with all information
-   - Execution plan
+
+3. **Configure environment**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env.local
+
+   # Edit .env.local and add your Gemini API key
+   # GEMINI_API_KEY=your_actual_api_key_here
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   - Navigate to http://localhost:3000
+   - Enter a project description and click "Analyze Project"
+
+## Usage Example
+
+Enter a project description like:
+```
+Create a todo app with user authentication, real-time updates,
+and mobile responsive design
+```
+
+The AI will generate:
+- Detailed task breakdown with IDs, priorities, and estimates
+- Frontend, backend, and infrastructure tasks
+- Dependencies between tasks
+- Acceptance criteria for each task
+- Step-by-step execution plan
 
 ## Project Structure
 
 ```
-webapp/
+.
 ├── app/
 │   ├── api/
 │   │   └── analyze/
 │   │       └── route.ts          # API endpoint for task analysis
-│   ├── favicon.ico
-│   ├── globals.css
-│   ├── layout.tsx
+│   ├── globals.css               # Global styles
+│   ├── layout.tsx                # Root layout
 │   └── page.tsx                  # Main UI page
 ├── components/
-│   └── TaskCard.tsx              # Professional task card component
+│   ├── CollapsibleTaskCard.tsx   # Collapsible task card component
+│   └── TaskCard.tsx              # Task card component
 ├── lib/
-│   └── AIAgentSystem.ts          # Wrapper to parent AI system
-├── public/
-├── .env.local                    # Local environment config
+│   └── parent/                   # Multi-agent AI system
+│       ├── agents/               # AI agents (Coordinator, Frontend, Backend)
+│       ├── services/             # Gemini AI service
+│       └── types/                # TypeScript types
+├── public/                       # Static assets
+├── .env.example                  # Environment variables template
 ├── next.config.ts                # Next.js configuration
 ├── package.json
-├── postcss.config.mjs
 └── tsconfig.json
-
 ```
-
-## Integration with Parent Project
-
-The webapp integrates with the main AI Agent System located in `/home/pranav/Software_Lab/src/`:
-- Imports `AIAgentSystem` class from parent `src` directory
-- Uses shared TypeScript types
-- Loads environment variables from parent `.env` file
 
 ## API Endpoint
 
@@ -125,10 +121,7 @@ Analyzes a project description and returns structured tasks.
       "priority": "high|medium|low",
       "estimatedHours": 8,
       "dependencies": ["task-2"],
-      "acceptance_criteria": [
-        "Criteria 1",
-        "Criteria 2"
-      ]
+      "acceptance_criteria": ["Criteria 1", "Criteria 2"]
     }
   ],
   "executionPlan": "Step-by-step execution plan",
@@ -137,21 +130,12 @@ Analyzes a project description and returns structured tasks.
 }
 ```
 
-## Troubleshooting
+## Available Scripts
 
-### Server won't start
-- Ensure Node.js 16+ is installed
-- Check that port 3000 is not in use
-- Verify dependencies are installed: `npm install`
-
-### API errors
-- Ensure GEMINI_API_KEY is set in parent `.env` file
-- Check that parent project is built: `cd .. && npm run build`
-- Verify the API key is valid
-
-### TypeScript errors
-- Ensure parent project TypeScript files are compiled
-- Run `npm run build` in parent directory
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
 ## Technologies Used
 
@@ -162,6 +146,30 @@ Analyzes a project description and returns structured tasks.
 - **Lucide React** - Icons
 - **Google Gemini AI** - AI-powered task breakdown
 
+## Troubleshooting
+
+### Server won't start
+- Ensure Node.js 18+ is installed: `node --version`
+- Check that port 3000 is not in use
+- Verify dependencies are installed: `npm install`
+
+### API errors
+- Ensure `GEMINI_API_KEY` is set in `.env.local`
+- Verify the API key is valid at [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Check browser console for detailed error messages
+
+### Build errors
+- Clear Next.js cache: `rm -rf .next`
+- Reinstall dependencies: `rm -rf node_modules package-lock.json && npm install`
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 ## License
 
 MIT
+
+## Author
+
+Built with Claude Code
