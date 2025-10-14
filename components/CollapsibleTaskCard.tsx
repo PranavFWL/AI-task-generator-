@@ -3,23 +3,83 @@
 import { useState } from 'react';
 import { CheckCircle2, Clock, GitBranch, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 
-// Utility function to clean markdown formatting from text
-const cleanMarkdown = (text: string): string => {
-  if (typeof text !== 'string') return String(text);
+// Utility function to safely convert any value to string and clean markdown
+const safeToString = (value: any): string => {
+  let text = '';
 
+  if (typeof value === 'string') {
+    text = value;
+  } else if (typeof value === 'number' || typeof value === 'boolean') {
+    text = String(value);
+  } else if (value === null || value === undefined) {
+    return '';
+  } else if (typeof value === 'object') {
+    // If it's an object with a 'text' or 'content' property, use that
+    if (value.text) text = String(value.text);
+    else if (value.content) text = String(value.content);
+    else if (value.description) text = String(value.description);
+    else {
+      // Otherwise try JSON stringify
+      try {
+        text = JSON.stringify(value);
+      } catch {
+        text = String(value);
+      }
+    }
+  } else {
+    text = String(value);
+  }
+
+  // Clean markdown formatting
   return text
-    // Remove bold markers (**text** or __text__)
+    // Remove bold (**text** or __text__)
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/__([^_]+)__/g, '$1')
-    // Remove italic markers (*text* or _text_)
+    // Remove italic (*text* or _text_)
     .replace(/\*([^*]+)\*/g, '$1')
     .replace(/_([^_]+)_/g, '$1')
-    // Remove leading bullets and dashes
-    .replace(/^\s*[\*\-]\s+/gm, '')
-    // Remove leading numbers with dots
-    .replace(/^\s*\d+\.\s+/gm, '')
+    // Remove code blocks (```text```)
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove headers (# ## ### etc)
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove links [text](url)
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
     // Clean up extra whitespace
     .trim();
+};
+
+// Format description with proper paragraphs and bullet points
+const formatDescription = (text: string): JSX.Element => {
+  if (!text) return <></>;
+
+  const lines = text.split('\n').filter(line => line.trim());
+
+  return (
+    <div className="space-y-3">
+      {lines.map((line, idx) => {
+        const trimmedLine = line.trim();
+
+        // Check if it's a bullet point (starts with •, *, -, or number.)
+        if (trimmedLine.match(/^[•\*\-]\s+/) || trimmedLine.match(/^\d+\.\s+/)) {
+          const content = trimmedLine.replace(/^[•\*\-]\s+/, '').replace(/^\d+\.\s+/, '');
+          return (
+            <div key={idx} className="flex gap-2 items-start">
+              <span className="text-indigo-500 mt-1">•</span>
+              <span className="flex-1 text-slate-700">{content}</span>
+            </div>
+          );
+        }
+
+        // Regular paragraph
+        return (
+          <p key={idx} className="text-slate-700 leading-relaxed">
+            {trimmedLine}
+          </p>
+        );
+      })}
+    </div>
+  );
 };
 
 interface Task {
@@ -121,7 +181,7 @@ export default function CollapsibleTaskCard({ task, index, defaultExpanded = fal
                 {index + 1}
               </span>
               <h3 className={`font-semibold text-base leading-tight ${categoryStyle.text} break-words pr-2`}>
-                {cleanMarkdown(typeof task.title === 'string' ? task.title : String(task.title))}
+                {safeToString(task.title)}
               </h3>
             </div>
             
@@ -172,8 +232,10 @@ export default function CollapsibleTaskCard({ task, index, defaultExpanded = fal
         <div className="p-4 border-t border-slate-100 space-y-4">
           {/* Description */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Description</h4>
-            <p className="text-sm text-slate-700 leading-relaxed">{cleanMarkdown(typeof task.description === 'string' ? task.description : String(task.description))}</p>
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Description</h4>
+            <div className="text-sm">
+              {formatDescription(safeToString(task.description))}
+            </div>
           </div>
 
           {/* Dependencies */}
@@ -186,7 +248,7 @@ export default function CollapsibleTaskCard({ task, index, defaultExpanded = fal
               <div className="flex flex-wrap gap-2">
                 {task.dependencies.map((dep, i) => (
                   <span key={i} className="px-2 py-1 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-xs font-medium">
-                    {cleanMarkdown(typeof dep === 'string' ? dep : String(dep))}
+                    {safeToString(dep)}
                   </span>
                 ))}
               </div>
@@ -204,7 +266,7 @@ export default function CollapsibleTaskCard({ task, index, defaultExpanded = fal
                 {task.acceptance_criteria.map((criteria, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="leading-snug">{cleanMarkdown(typeof criteria === 'string' ? criteria : String(criteria))}</span>
+                    <span className="leading-snug">{safeToString(criteria)}</span>
                   </li>
                 ))}
               </ul>

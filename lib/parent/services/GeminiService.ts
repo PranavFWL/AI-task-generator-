@@ -53,40 +53,20 @@ export class GeminiService {
       return;
     }
 
-    // Try different model names in order of preference
-    const modelNames = [
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-2.5-pro',
-      'models/gemini-2.5-flash',
-      'models/gemini-2.0-flash',
-      'models/gemini-2.5-pro',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro',
-      'gemini-pro'
-    ];
+    // Use gemini-2.0-flash directly (it's free and widely available)
+    // Skip testing to save API quota
+    const modelName = 'gemini-2.0-flash';
 
-    for (const modelName of modelNames) {
-      try {
-        console.log(`🧪 Testing model: ${modelName}`);
-        const testModel = this.genAI.getGenerativeModel({ model: modelName });
-
-        // Actually test the model with a simple request
-        const result = await testModel.generateContent('Hello');
-        await result.response; // Ensure we can get the response
-
-        // If we get here, the model works
-        this.model = testModel;
-        this.modelInitialized = true;
-        console.log(`✅ Gemini AI model validated: ${modelName}`);
-        return;
-
-      } catch (modelError: any) {
-        console.log(`❌ Model ${modelName} failed test: ${modelError.message || modelError}`);
-      }
+    try {
+      console.log(`🚀 Initializing Gemini model: ${modelName}`);
+      this.model = this.genAI.getGenerativeModel({ model: modelName });
+      this.modelInitialized = true;
+      console.log(`✅ Gemini AI model initialized: ${modelName}`);
+      return;
+    } catch (modelError: any) {
+      console.log(`❌ Failed to initialize ${modelName}: ${modelError.message || modelError}`);
+      throw new Error(`Failed to initialize Gemini model: ${modelError.message}`);
     }
-
-    throw new Error('No working Gemini model found');
   }
 
   private async listAvailableModels() {

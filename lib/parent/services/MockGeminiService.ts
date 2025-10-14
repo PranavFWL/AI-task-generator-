@@ -272,6 +272,243 @@ export class MockGeminiService {
       });
     }
 
+    // FALLBACK: If no tasks generated, create generic project structure
+    if (tasks.length === 0) {
+      console.log('⚠️ No keywords matched, generating comprehensive project tasks...');
+
+      // Task 1: Database & Backend Architecture
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Design Database Schema and Backend Architecture',
+        description: `Build a scalable, secure backend foundation for the project. This includes:
+
+• Design normalized database schema with proper relationships and indexes
+• Set up database migrations and seeders for development
+• Create data models with validation rules
+• Implement database connection pooling and optimization
+• Design RESTful API architecture with versioning
+• Set up proper error handling and logging mechanisms
+• Configure environment-based settings (development, staging, production)
+• Implement health check and monitoring endpoints`,
+        type: 'backend',
+        priority: 'high',
+        acceptance_criteria: [
+          'Complete database schema diagram created',
+          'All data models implemented with proper relationships',
+          'Database migrations tested and documented',
+          'API endpoints follow RESTful conventions',
+          'Environment configuration properly set up',
+          'Database queries optimized with proper indexing',
+          'Error handling middleware implemented',
+          'API documentation generated (Swagger/OpenAPI)'
+        ],
+        estimatedHours: 20
+      });
+
+      // Task 2: Authentication & Authorization
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Implement User Authentication and Authorization System',
+        description: `Create a secure, production-ready authentication system. This includes:
+
+• User registration with email/phone verification
+• Secure login with password hashing (bcrypt/argon2)
+• JWT token-based authentication with refresh tokens
+• Password reset and account recovery flow
+• Role-based access control (RBAC) system
+• Session management and token expiration handling
+• Account security features (2FA support, login history)
+• OAuth integration for social login (Google, GitHub, etc.)`,
+        type: 'backend',
+        priority: 'high',
+        acceptance_criteria: [
+          'User registration with email verification working',
+          'Secure login system with proper password hashing',
+          'JWT tokens generated and validated correctly',
+          'Password reset flow fully functional',
+          'Role-based permissions implemented',
+          'Refresh token mechanism working',
+          'Security best practices followed (rate limiting, etc.)',
+          'Social login integration completed'
+        ],
+        estimatedHours: 18
+      });
+
+      // Task 3: Core Business Logic
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Develop Core Business Logic and API Endpoints',
+        description: `Implement the main functionality and business rules for the application. This includes:
+
+• Create CRUD operations for all main entities
+• Implement business validation rules and workflows
+• Build complex query and filtering capabilities
+• Add pagination, sorting, and search functionality
+• Implement data relationships and cascading operations
+• Create bulk operations for efficiency
+• Add data export and import features
+• Implement audit trails and activity logging`,
+        type: 'backend',
+        priority: 'high',
+        acceptance_criteria: [
+          'All CRUD operations working correctly',
+          'Business validation rules enforced',
+          'Advanced filtering and search implemented',
+          'Pagination working on all list endpoints',
+          'Data relationships properly handled',
+          'Bulk operations tested and optimized',
+          'Export functionality working (CSV, PDF, etc.)',
+          'Activity logs captured for important actions'
+        ],
+        estimatedHours: 28
+      });
+
+      // Task 4: Frontend Components & UI
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Build Responsive UI Components and Layout System',
+        description: `Create a modern, accessible, and responsive user interface. This includes:
+
+• Design and implement reusable component library
+• Build responsive layout system (mobile, tablet, desktop)
+• Create navigation system (header, sidebar, breadcrumbs)
+• Implement form components with validation
+• Build data display components (tables, cards, lists)
+• Add loading states, skeletons, and empty states
+• Implement modal, drawer, and notification systems
+• Ensure accessibility compliance (WCAG 2.1 AA)`,
+        type: 'frontend',
+        priority: 'high',
+        acceptance_criteria: [
+          'Component library with 20+ reusable components',
+          'Fully responsive design for all screen sizes',
+          'Navigation system working smoothly',
+          'Forms with real-time validation implemented',
+          'Data tables with sorting and filtering',
+          'Loading and error states properly displayed',
+          'Modal and notification systems functional',
+          'Accessibility audit passed with no critical issues'
+        ],
+        estimatedHours: 24
+      });
+
+      // Task 5: State Management & API Integration
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Implement State Management and API Integration Layer',
+        description: `Set up efficient state management and connect frontend to backend APIs. This includes:
+
+• Configure global state management (Redux/Zustand/Context)
+• Create API client with interceptors and error handling
+• Implement data caching and optimistic updates
+• Set up request/response transformations
+• Add loading and error state management
+• Implement retry logic and offline support
+• Create hooks for data fetching and mutations
+• Add WebSocket support for real-time features (if needed)`,
+        type: 'frontend',
+        priority: 'high',
+        acceptance_criteria: [
+          'State management system properly configured',
+          'All API endpoints integrated',
+          'Loading states displayed during API calls',
+          'Error messages shown appropriately',
+          'Data caching working to reduce API calls',
+          'Optimistic updates implemented where needed',
+          'Custom hooks created for common operations',
+          'Real-time updates working (if applicable)'
+        ],
+        estimatedHours: 16
+      });
+
+      // Task 6: Testing & Quality Assurance
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Implement Comprehensive Testing Suite',
+        description: `Create automated tests to ensure code quality and reliability. This includes:
+
+• Set up testing framework and test environment
+• Write unit tests for business logic and utilities
+• Create integration tests for API endpoints
+• Implement component tests for UI elements
+• Add end-to-end tests for critical user flows
+• Set up test coverage reporting (aim for 80%+)
+• Implement continuous testing in CI/CD pipeline
+• Create testing documentation and guidelines`,
+        type: 'backend',
+        priority: 'medium',
+        acceptance_criteria: [
+          'Testing framework configured (Jest, Vitest, etc.)',
+          'Unit tests covering core business logic',
+          'Integration tests for all API endpoints',
+          'Component tests for major UI components',
+          'E2E tests for main user workflows',
+          'Test coverage above 80%',
+          'Tests running automatically in CI/CD',
+          'Testing documentation completed'
+        ],
+        estimatedHours: 20
+      });
+
+      // Task 7: Security & Performance Optimization
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Implement Security Measures and Performance Optimization',
+        description: `Ensure the application is secure and performs efficiently. This includes:
+
+• Implement input validation and sanitization
+• Add rate limiting and DDoS protection
+• Set up CORS policies and security headers
+• Implement SQL injection and XSS prevention
+• Add API request logging and monitoring
+• Optimize database queries and add indexes
+• Implement caching strategy (Redis/memory cache)
+• Perform security audit and penetration testing`,
+        type: 'backend',
+        priority: 'high',
+        acceptance_criteria: [
+          'All user inputs validated and sanitized',
+          'Rate limiting implemented on all endpoints',
+          'Security headers properly configured',
+          'No SQL injection or XSS vulnerabilities',
+          'Request/response logging working',
+          'Slow queries identified and optimized',
+          'Caching implemented for frequently accessed data',
+          'Security audit completed with no critical issues'
+        ],
+        estimatedHours: 16
+      });
+
+      // Task 8: Deployment & DevOps Setup
+      tasks.push({
+        id: this.generateTaskId(),
+        title: 'Setup CI/CD Pipeline and Production Deployment',
+        description: `Prepare the application for production deployment with automated workflows. This includes:
+
+• Configure CI/CD pipeline (GitHub Actions/GitLab CI)
+• Set up automated testing and code quality checks
+• Create Docker containers for easy deployment
+• Configure production environment variables
+• Set up database backup and recovery procedures
+• Implement application monitoring and alerting
+• Configure auto-scaling and load balancing
+• Create deployment documentation and runbooks`,
+        type: 'backend',
+        priority: 'medium',
+        acceptance_criteria: [
+          'CI/CD pipeline running successfully',
+          'Automated tests passing before deployment',
+          'Docker images built and pushed to registry',
+          'Production environment properly configured',
+          'Database backups scheduled and tested',
+          'Monitoring dashboards set up',
+          'Auto-scaling configured and tested',
+          'Deployment documentation completed'
+        ],
+        estimatedHours: 14
+      });
+    }
+
     return tasks;
   }
 
