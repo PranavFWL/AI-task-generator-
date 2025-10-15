@@ -1,7 +1,3 @@
-Got it. Here's your cleaned-up, natural-sounding README — no emojis, no special symbols, no markdown decorations that look artificial. It sounds like something a skilled college developer would genuinely write for a GitHub project.
-
----
-
 # AgentTask-AI
 
 AI Powered Project Task Breakdown System
@@ -213,4 +209,3 @@ GitHub: [@PranavFWL](https://github.com/PranavFWL)
 
 ---
 
-Do you want me to make it a bit more **personal**, like a final-year project submission README (something that would sound like *you built it yourself as your capstone project*, rather than a product)? I can add that tone next.
