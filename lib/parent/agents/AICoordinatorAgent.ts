@@ -29,18 +29,16 @@ export class AICoordinatorAgent extends BaseAgent {
       // Use Gemini AI to analyze the project and generate tasks
       const aiTasks = await this.geminiService.analyzeProjectBrief(brief);
 
-      // Enhance each task with more detailed requirements
-      const enhancedTasks = await Promise.all(
-        aiTasks.map(task => this.geminiService.enhanceTaskDescription(task))
-      );
+      // Skip task enhancement to save API calls (directly use generated tasks)
+      // Tasks already have good quality from initial analysis
 
-      const executionPlan = this.createAIExecutionPlan(enhancedTasks, brief);
-      const aiAnalysis = this.generateAIAnalysis(brief, enhancedTasks);
+      const executionPlan = this.createAIExecutionPlan(aiTasks, brief);
+      const aiAnalysis = this.generateAIAnalysis(brief, aiTasks);
 
-      console.log(`✅ AI generated ${enhancedTasks.length} enhanced technical tasks`);
+      console.log(`✅ AI generated ${aiTasks.length} technical tasks`);
 
       return {
-        tasks: enhancedTasks,
+        tasks: aiTasks,
         executionPlan,
         aiAnalysis
       };

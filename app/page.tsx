@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Sparkles, Brain, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import CollapsibleTaskCard from '@/components/CollapsibleTaskCard';
+import CodeViewer from '@/components/CodeViewer';
 
 interface Task {
   id: string;
@@ -15,11 +16,20 @@ interface Task {
   acceptance_criteria: (string | any)[];
 }
 
+interface GeneratedFile {
+  path: string;
+  content: string;
+  type: string;
+}
+
 interface AnalysisResult {
   tasks: Task[];
   executionPlan: string;
   aiAnalysis?: string;
   projectSummary?: string;
+  generatedFiles?: GeneratedFile[];
+  summary?: string;
+  aiInsights?: string;
 }
 
 export default function Home() {
@@ -161,6 +171,14 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Generated Code */}
+            {result.generatedFiles && result.generatedFiles.length > 0 && (
+              <CodeViewer
+                files={result.generatedFiles}
+                projectDescription={prompt}
+              />
+            )}
+
             {/* Execution Plan */}
             {result.executionPlan && (
               <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
@@ -169,6 +187,17 @@ export default function Home() {
                   <h2 className="text-2xl font-bold text-slate-900">Execution Plan</h2>
                 </div>
                 <p className="text-slate-700 leading-relaxed whitespace-pre-line">{result.executionPlan}</p>
+              </div>
+            )}
+
+            {/* AI Insights */}
+            {result.aiInsights && (
+              <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Brain className="w-6 h-6 text-purple-600" />
+                  <h2 className="text-2xl font-bold text-slate-900">AI Insights</h2>
+                </div>
+                <p className="text-slate-700 leading-relaxed whitespace-pre-line">{result.aiInsights}</p>
               </div>
             )}
           </div>

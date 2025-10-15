@@ -23,14 +23,22 @@ export async function POST(request: NextRequest) {
       constraints: constraints || []
     };
 
-    // Get task breakdown with AI analysis
-    const result = await agentSystem.breakdownOnly(projectBrief);
+    // Process project and generate code
+    const result = await agentSystem.processProject(projectBrief);
+
+    // Extract generated files from results
+    const generatedFiles = result.results
+      .filter(r => r.success && r.files)
+      .flatMap(r => r.files || []);
 
     return NextResponse.json({
       tasks: result.tasks,
       executionPlan: result.executionPlan,
       aiAnalysis: result.aiAnalysis,
-      projectSummary: description
+      aiInsights: result.aiInsights,
+      projectSummary: description,
+      generatedFiles: generatedFiles,
+      summary: result.summary
     });
   } catch (error) {
     console.error('Error analyzing project:', error);

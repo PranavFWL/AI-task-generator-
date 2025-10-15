@@ -1247,11 +1247,379 @@ export const requestLogger = (
   }
 
   private generateDatabaseSchema(task: TechnicalTask): GeneratedFile[] {
+    // Generate Prisma schema for PostgreSQL
+    const prismaSchema = {
+      path: 'prisma/schema.prisma',
+      type: 'schema' as const,
+      content: `// Prisma schema for PostgreSQL
+// Documentation: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tasks     Task[]
+  sharedTasks TaskShare[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(500)
+  description String?  @db.Text
+  completed   Boolean  @default(false)
+  priority    Priority @default(MEDIUM)
+  userId      String   @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shares      TaskShare[]
+
+  @@index([userId])
+  @@index([completed])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("tasks")
+}
+
+model TaskShare {
+  id         String     @id @default(uuid())
+  taskId     String     @map("task_id")
+  userId     String     @map("user_id")
+  permission Permission @default(READ)
+  sharedAt   DateTime   @default(now()) @map("shared_at")
+
+  task       Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+  @@map("task_shares")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Permission {
+  READ
+  WRITE
+}`
+    };
+
+    // Generate Prisma client wrapper
+    const prismaClient = {
+      path: 'src/lib/prisma.ts',
+      type: 'config' as const,
+      content: `import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
+
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  await prisma.$disconnect();
+});
+
+export default prisma;`
+    };
+
+    // Generate User repository with Prisma
+    const userRepository = {
+      path: 'src/repositories/UserRepository.ts',
+      type: 'schema' as const,
+      content: `import { User, Prisma } from '@prisma/client';
+import prisma from '../lib/prisma';
+import bcrypt from 'bcrypt';
+
+export class UserRepository {
+  async create(data: Prisma.UserCreateInput): Promise<User> {
+    return await prisma.user.create({
+      data,
+    });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {
+    return await prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string): Promise<User> {
+    return await prisma.user.delete({
+      where: { id },
+    });
+  }
+
+  async findAll(skip?: number, take?: number): Promise<User[]> {
+    return await prisma.user.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        password: false, // Never return passwords
+      },
+    });
+  }
+
+  async searchByNameOrEmail(query: string, limit: number = 10): Promise<Partial<User>[]> {
+    return await prisma.user.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: false,
+      },
+    });
+  }
+}
+
+export const userRepository = new UserRepository();`
+    };
+
+    // Generate Task repository with Prisma
+    const taskRepository = {
+      path: 'src/repositories/TaskRepository.ts',
+      type: 'schema' as const,
+      content: `import { Task, Prisma } from '@prisma/client';
+import prisma from '../lib/prisma';
+
+export interface TaskFilters {
+  userId?: string;
+  completed?: boolean;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  search?: string;
+}
+
+export interface PaginationOptions {
+  page: number;
+  limit: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export class TaskRepository {
+  async create(data: Prisma.TaskCreateInput): Promise<Task> {
+    return await prisma.task.create({
+      data,
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  }
+
+  async findById(id: string, userId?: string): Promise<Task | null> {
+    const task = await prisma.task.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+        shares: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+        },
+      },
+    });
+
+    // Check access
+    if (userId && task) {
+      const hasAccess = task.userId === userId ||
+                       task.shares.some(share => share.userId === userId);
+      if (!hasAccess) {
+        return null;
+      }
+    }
+
+    return task;
+  }
+
+  async findByFilters(
+    filters: TaskFilters,
+    options: PaginationOptions
+  ): Promise<PaginatedResult<Task>> {
+    const where: Prisma.TaskWhereInput = {};
+
+    if (filters.userId) {
+      where.OR = [
+        { userId: filters.userId },
+        { shares: { some: { userId: filters.userId } } },
+      ];
+    }
+
+    if (filters.completed !== undefined) {
+      where.completed = filters.completed;
+    }
+
+    if (filters.priority) {
+      where.priority = filters.priority;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [total, items] = await Promise.all([
+      prisma.task.count({ where }),
+      prisma.task.findMany({
+        where,
+        skip: (options.page - 1) * options.limit,
+        take: options.limit,
+        orderBy: {
+          [options.sortBy || 'createdAt']: options.sortOrder || 'desc',
+        },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      page: options.page,
+      limit: options.limit,
+      totalPages: Math.ceil(total / options.limit),
+    };
+  }
+
+  async update(id: string, data: Prisma.TaskUpdateInput): Promise<Task> {
+    return await prisma.task.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string): Promise<Task> {
+    return await prisma.task.delete({
+      where: { id },
+    });
+  }
+
+  async shareWithUser(
+    taskId: string,
+    userId: string,
+    permission: 'READ' | 'WRITE'
+  ): Promise<void> {
+    await prisma.taskShare.upsert({
+      where: {
+        taskId_userId: { taskId, userId },
+      },
+      create: {
+        taskId,
+        userId,
+        permission,
+      },
+      update: {
+        permission,
+      },
+    });
+  }
+
+  async unshareWithUser(taskId: string, userId: string): Promise<void> {
+    await prisma.taskShare.delete({
+      where: {
+        taskId_userId: { taskId, userId },
+      },
+    });
+  }
+
+  async getSharedUsers(taskId: string): Promise<any[]> {
+    const shares = await prisma.taskShare.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    return shares.map(share => ({
+      ...share.user,
+      permission: share.permission,
+      sharedAt: share.sharedAt,
+    }));
+  }
+}
+
+export const taskRepository = new TaskRepository();`
+    };
+
     const databaseConfig = {
       path: 'src/config/database.ts',
       type: 'config' as const,
-      content: `// Database configuration
-// This is a mock implementation - replace with actual database setup
+      content: `// Database configuration with Prisma
+// This uses PostgreSQL with Prisma ORM for type-safe database access
 
 export interface DatabaseConfig {
   host: string;

@@ -1,6 +1,10 @@
 import { BaseAgent } from './BaseAgent';
 import { GeminiService } from '../services/GeminiService';
 import { TechnicalTask, AgentResponse, GeneratedFile } from '../types';
+import { DatabaseSchemaGenerator } from '../utils/DatabaseSchemaGenerator';
+import { TaskSchedulingGenerator } from '../utils/TaskSchedulingGenerator';
+import { BusinessLogicGenerator } from '../utils/BusinessLogicGenerator';
+import { DatabaseOptimizationGenerator } from '../utils/DatabaseOptimizationGenerator';
 
 export class AIBackendAgent extends BaseAgent {
   private geminiService: GeminiService;
@@ -350,11 +354,22 @@ export interface Update${modelName}Data {
     const envConfigFile = this.generateEnvConfigFile(task);
     additionalFiles.push(envConfigFile);
 
-    // Generate database migration (if applicable)
-    if (task.title.toLowerCase().includes('database') || task.title.toLowerCase().includes('model')) {
-      const migrationFile = this.generateMigrationFile(task);
-      additionalFiles.push(migrationFile);
-    }
+    // Generate database migration for backend tasks
+    // This ensures we always have a schema when building backend features
+    const migrationFile = this.generateMigrationFile(task);
+    additionalFiles.push(migrationFile);
+
+    // Generate task scheduling files if needed
+    const schedulingFiles = TaskSchedulingGenerator.generateSchedulingFiles(task);
+    additionalFiles.push(...schedulingFiles);
+
+    // Generate business logic workflows
+    const businessLogicFiles = BusinessLogicGenerator.generateBusinessLogicFiles(task);
+    additionalFiles.push(...businessLogicFiles);
+
+    // Generate database optimization and connection pooling files
+    const optimizationFiles = DatabaseOptimizationGenerator.generateOptimizationFiles();
+    additionalFiles.push(...optimizationFiles);
 
     // Generate API tests
     const testFile = this.generateTestFile(task, existingFiles);
@@ -481,27 +496,13 @@ export const validateEnvironment = (): void => {
     const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
     const taskName = task.title.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 
+    // Generate actual database schema based on task analysis
+    const tables = DatabaseSchemaGenerator.generateSchemaFromTask(task);
+    const sqlContent = DatabaseSchemaGenerator.generateSQL(tables, 'postgresql');
+
     return {
       path: `src/migrations/${timestamp}_${taskName}.sql`,
-      content: `-- Migration for ${task.title}
--- Generated on ${new Date().toISOString()}
-
-BEGIN;
-
--- Add your database schema changes here
--- Example:
--- CREATE TABLE IF NOT EXISTS users (
---   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
---   email VARCHAR(255) UNIQUE NOT NULL,
---   password VARCHAR(255) NOT NULL,
---   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
-
--- Add indexes for performance
--- CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-
-COMMIT;`,
+      content: sqlContent,
       type: 'other'
     };
   }
