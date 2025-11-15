@@ -23,7 +23,7 @@ export class AICoordinatorAgent extends BaseAgent {
     executionPlan: string;
     aiAnalysis: string;
   }> {
-    console.log('🧠 AI Coordinator analyzing project brief...');
+    console.log('[System] AI Coordinator analyzing project brief...');
 
     try {
       // Use Gemini AI to analyze the project and generate tasks
@@ -35,7 +35,7 @@ export class AICoordinatorAgent extends BaseAgent {
       const executionPlan = this.createAIExecutionPlan(aiTasks, brief);
       const aiAnalysis = this.generateAIAnalysis(brief, aiTasks);
 
-      console.log(`✅ AI generated ${aiTasks.length} technical tasks`);
+      console.log(`[Success] AI generated ${aiTasks.length} technical tasks`);
 
       return {
         tasks: aiTasks,
@@ -44,7 +44,7 @@ export class AICoordinatorAgent extends BaseAgent {
       };
 
     } catch (error) {
-      console.warn('⚠️ AI analysis failed, using fallback approach:', error);
+      console.warn('[Warning] AI analysis failed, using fallback approach:', error);
 
       // Fallback to rule-based approach
       const fallbackTasks = this.fallbackBreakdownProject(brief);
@@ -63,13 +63,13 @@ export class AICoordinatorAgent extends BaseAgent {
     summary: string;
     aiInsights: string;
   }> {
-    console.log('🚀 AI Coordinator executing project...');
+    console.log('[Starting] AI Coordinator executing project...');
 
     const { tasks, aiAnalysis } = await this.processProjectBrief(brief);
     const results: AgentResponse[] = [];
 
     for (const task of tasks) {
-      console.log(`\n🔧 AI processing: ${task.title}`);
+      console.log(`\n[Processing] AI processing: ${task.title}`);
 
       try {
         const result = await this.executeTask(task);
@@ -77,12 +77,12 @@ export class AICoordinatorAgent extends BaseAgent {
 
         if (result.success) {
           this.completedTasks.push(task);
-          console.log(`✅ AI completed: ${task.title}`);
+          console.log(`[Success] AI completed: ${task.title}`);
         } else {
-          console.log(`❌ AI failed: ${task.title} - ${result.error}`);
+          console.log(`[Error] AI failed: ${task.title} - ${result.error}`);
         }
       } catch (error) {
-        console.log(`💥 AI error: ${task.title} - ${error}`);
+        console.log(`[Error] AI error: ${task.title} - ${error}`);
         results.push({
           success: false,
           output: '',
@@ -133,52 +133,52 @@ export class AICoordinatorAgent extends BaseAgent {
     const backendTasks = tasks.filter(t => t.type === 'backend');
     const frontendTasks = tasks.filter(t => t.type === 'frontend');
 
-    let plan = `🤖 AI-Generated Execution Plan\n`;
+    let plan = `[AI] AI-Generated Execution Plan\n`;
     plan += `=====================================\n\n`;
 
-    plan += `📋 Project Overview:\n`;
+    plan += `[Project] Project Overview:\n`;
     plan += `${brief.description}\n\n`;
 
     if (brief.requirements && brief.requirements.length > 0) {
       plan += `📌 Key Requirements:\n`;
-      brief.requirements.forEach(req => plan += `• ${req}\n`);
+      brief.requirements.forEach(req => plan += `- ${req}\n`);
       plan += `\n`;
     }
 
-    plan += `🏗️ Phase 1 - Backend Development (${backendTasks.length} tasks):\n`;
+    plan += `[Phase] Phase 1 - Backend Development (${backendTasks.length} tasks):\n`;
     backendTasks.forEach((task, index) => {
       plan += `  ${index + 1}. ${task.title} [${task.priority} priority]\n`;
       if (task.estimatedHours) {
-        plan += `     ⏱️ Estimated: ${task.estimatedHours} hours\n`;
+        plan += `     Est: Estimated: ${task.estimatedHours} hours\n`;
       }
     });
 
-    plan += `\n🎨 Phase 2 - Frontend Development (${frontendTasks.length} tasks):\n`;
+    plan += `\n[Frontend] Phase 2 - Frontend Development (${frontendTasks.length} tasks):\n`;
     frontendTasks.forEach((task, index) => {
       plan += `  ${index + 1}. ${task.title} [${task.priority} priority]\n`;
       if (task.estimatedHours) {
-        plan += `     ⏱️ Estimated: ${task.estimatedHours} hours\n`;
+        plan += `     Est: Estimated: ${task.estimatedHours} hours\n`;
       }
     });
 
     const totalEstimated = tasks.reduce((sum, task) => sum + (task.estimatedHours || 0), 0);
     if (totalEstimated > 0) {
-      plan += `\n⏰ Total Estimated Time: ${totalEstimated} hours\n`;
+      plan += `\n[Time] Total Estimated Time: ${totalEstimated} hours\n`;
     }
 
-    plan += `\n📊 Total Tasks: ${tasks.length}`;
+    plan += `\n[Data] Total Tasks: ${tasks.length}`;
     return plan;
   }
 
   private generateAIAnalysis(brief: ProjectBrief, tasks: TechnicalTask[]): string {
-    let analysis = `🧠 AI Project Analysis\n`;
+    let analysis = `[System] AI Project Analysis\n`;
     analysis += `======================\n\n`;
 
-    analysis += `🎯 Project Complexity: ${this.assessComplexity(tasks)}\n`;
-    analysis += `🏗️ Architecture Pattern: ${this.identifyArchitecture(brief, tasks)}\n`;
-    analysis += `🔧 Technology Stack: ${this.identifyTechStack(tasks)}\n`;
-    analysis += `⚠️ Risk Factors: ${this.identifyRisks(brief, tasks)}\n`;
-    analysis += `💡 Recommendations: ${this.generateRecommendations(brief, tasks)}\n`;
+    analysis += `[Summary] Project Complexity: ${this.assessComplexity(tasks)}\n`;
+    analysis += `[Phase] Architecture Pattern: ${this.identifyArchitecture(brief, tasks)}\n`;
+    analysis += `[Processing] Technology Stack: ${this.identifyTechStack(tasks)}\n`;
+    analysis += `[Warning] Risk Factors: ${this.identifyRisks(brief, tasks)}\n`;
+    analysis += `[Info] Recommendations: ${this.generateRecommendations(brief, tasks)}\n`;
 
     return analysis;
   }
@@ -188,32 +188,32 @@ export class AICoordinatorAgent extends BaseAgent {
     const failed = results.length - successful;
     const totalFiles = results.reduce((sum, r) => sum + (r.files?.length || 0), 0);
 
-    let insights = `🔮 AI Execution Insights\n`;
+    let insights = `[Insights] AI Execution Insights\n`;
     insights += `========================\n\n`;
 
-    insights += `📈 Success Rate: ${Math.round((successful / results.length) * 100)}%\n`;
-    insights += `📁 Files Generated: ${totalFiles}\n`;
-    insights += `🎯 Task Completion: ${successful}/${results.length}\n\n`;
+    insights += `[Stats] Success Rate: ${Math.round((successful / results.length) * 100)}%\n`;
+    insights += `[Files] Files Generated: ${totalFiles}\n`;
+    insights += `[Summary] Task Completion: ${successful}/${results.length}\n\n`;
 
     if (failed > 0) {
-      insights += `⚠️ Areas for Improvement:\n`;
+      insights += `[Warning] Areas for Improvement:\n`;
       results.forEach((result, index) => {
         if (!result.success) {
-          insights += `• ${tasks[index]?.title}: ${result.error}\n`;
+          insights += `- ${tasks[index]?.title}: ${result.error}\n`;
         }
       });
       insights += `\n`;
     }
 
-    insights += `💡 AI Recommendations:\n`;
+    insights += `[Info] AI Recommendations:\n`;
     if (successful === results.length) {
-      insights += `• Excellent execution! All tasks completed successfully.\n`;
-      insights += `• Consider adding automated testing for the generated code.\n`;
-      insights += `• Review code quality and optimize for production deployment.\n`;
+      insights += `- Excellent execution! All tasks completed successfully.\n`;
+      insights += `- Consider adding automated testing for the generated code.\n`;
+      insights += `- Review code quality and optimize for production deployment.\n`;
     } else {
-      insights += `• Review failed tasks and retry with more specific requirements.\n`;
-      insights += `• Consider breaking down complex tasks into smaller chunks.\n`;
-      insights += `• Verify API connections and dependencies.\n`;
+      insights += `- Review failed tasks and retry with more specific requirements.\n`;
+      insights += `- Consider breaking down complex tasks into smaller chunks.\n`;
+      insights += `- Verify API connections and dependencies.\n`;
     }
 
     return insights;
@@ -313,18 +313,18 @@ export class AICoordinatorAgent extends BaseAgent {
     const failed = results.length - successful;
     const totalFiles = results.reduce((sum, r) => sum + (r.files?.length || 0), 0);
 
-    let summary = `🤖 AI Project Execution Summary\n`;
+    let summary = `[AI] AI Project Execution Summary\n`;
     summary += `================================\n`;
-    summary += `📊 Total tasks: ${results.length}\n`;
-    summary += `✅ Successful: ${successful}\n`;
-    summary += `❌ Failed: ${failed}\n`;
-    summary += `📁 Files generated: ${totalFiles}\n`;
+    summary += `[Data] Total tasks: ${results.length}\n`;
+    summary += `[Success] Successful: ${successful}\n`;
+    summary += `[Error] Failed: ${failed}\n`;
+    summary += `[Files] Files generated: ${totalFiles}\n`;
 
     if (failed > 0) {
-      summary += `\n⚠️ Failed tasks:\n`;
+      summary += `\n[Warning] Failed tasks:\n`;
       results.forEach((result, index) => {
         if (!result.success) {
-          summary += `• Task ${index + 1}: ${result.error}\n`;
+          summary += `- Task ${index + 1}: ${result.error}\n`;
         }
       });
     }

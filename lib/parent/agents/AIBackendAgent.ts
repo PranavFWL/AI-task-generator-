@@ -23,7 +23,7 @@ export class AIBackendAgent extends BaseAgent {
       };
     }
 
-    console.log(`⚙️ AI Backend Agent processing: ${task.title}`);
+    console.log(`[Backend] AI Backend Agent processing: ${task.title}`);
 
     try {
       // Use AI to generate backend code
@@ -34,7 +34,7 @@ export class AIBackendAgent extends BaseAgent {
 
       const output = this.generateTaskOutput(task, processedFiles, aiResult.explanation);
 
-      console.log(`✅ AI Backend generated ${processedFiles.length} files`);
+      console.log(`[Success] AI Backend generated ${processedFiles.length} files`);
 
       return {
         success: true,
@@ -43,7 +43,7 @@ export class AIBackendAgent extends BaseAgent {
       };
 
     } catch (error) {
-      console.warn(`⚠️ AI generation failed, using fallback for: ${task.title}`);
+      console.warn(`[Warning] AI generation failed, using fallback for: ${task.title}`);
 
       // Fallback to rule-based generation if AI fails
       try {
@@ -952,26 +952,26 @@ export class TaskController {
   }
 
   private generateTaskOutput(task: TechnicalTask, files: GeneratedFile[], explanation: string): string {
-    let output = `🤖 AI Backend Agent - Task Completed: ${task.title}\n\n`;
-    output += `📊 Generated ${files.length} files:\n`;
+    let output = `[AI] AI Backend Agent - Task Completed: ${task.title}\n\n`;
+    output += `[Data] Generated ${files.length} files:\n`;
 
     files.forEach(file => {
-      output += `• ${file.path} (${file.type})\n`;
+      output += `- ${file.path} (${file.type})\n`;
     });
 
-    output += `\n⚙️ AI Enhancement Features:\n`;
-    output += `• Comprehensive error handling with proper HTTP status codes\n`;
-    output += `• Input validation and sanitization\n`;
-    output += `• Security features (rate limiting, password hashing)\n`;
-    output += `• Request/response logging and monitoring\n`;
-    output += `• TypeScript interfaces and proper typing\n`;
-    output += `• API documentation with JSDoc comments\n`;
-    output += `• Environment configuration management\n`;
-    output += `• Database migration scripts\n`;
-    output += `• Comprehensive test suites\n`;
+    output += `\n[Backend] AI Enhancement Features:\n`;
+    output += `- Comprehensive error handling with proper HTTP status codes\n`;
+    output += `- Input validation and sanitization\n`;
+    output += `- Security features (rate limiting, password hashing)\n`;
+    output += `- Request/response logging and monitoring\n`;
+    output += `- TypeScript interfaces and proper typing\n`;
+    output += `- API documentation with JSDoc comments\n`;
+    output += `- Environment configuration management\n`;
+    output += `- Database migration scripts\n`;
+    output += `- Comprehensive test suites\n`;
 
     if (explanation) {
-      output += `\n🧠 AI Explanation:\n${explanation}\n`;
+      output += `\n[System] AI Explanation:\n${explanation}\n`;
     }
 
     return output;

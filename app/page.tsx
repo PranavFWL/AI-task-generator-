@@ -61,6 +61,15 @@ export default function Home() {
       }
 
       const data = await response.json();
+      console.log('[Frontend] Received data:', {
+        tasksCount: data.tasks?.length,
+        filesCount: data.generatedFiles?.length,
+        totalFiles: data.totalFiles
+      });
+      if (data.generatedFiles) {
+        console.log('[Frontend] Files received:', data.generatedFiles.length);
+        console.log('[Frontend] First 5 file paths:', data.generatedFiles.slice(0, 5).map((f: any) => f.path));
+      }
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

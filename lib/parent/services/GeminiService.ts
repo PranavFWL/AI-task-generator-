@@ -26,24 +26,24 @@ export class GeminiService {
   constructor() {
     // Check if Gemini AI is available
     if (!GoogleGenerativeAI) {
-      console.log('🔄 Using Mock Gemini Service (dependencies not installed)');
+      console.log('[Fallback] Using Mock Gemini Service (dependencies not installed)');
       this.mockService = new MockGeminiService();
       return;
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    console.log(`🔑 API Key status: ${apiKey ? 'Found (length: ' + apiKey.length + ')' : 'Not found'}`);
+    console.log(`[Key] API Key status: ${apiKey ? 'Found (length: ' + apiKey.length + ')' : 'Not found'}`);
     if (!apiKey) {
-      console.log('⚠️ GEMINI_API_KEY not found, using Mock Gemini Service');
+      console.log('[Warning] GEMINI_API_KEY not found, using Mock Gemini Service');
       this.mockService = new MockGeminiService();
       return;
     }
 
     try {
       this.genAI = new GoogleGenerativeAI(apiKey);
-      console.log('✅ Gemini AI client initialized (model will be tested on first use)');
+      console.log('[Success] Gemini AI client initialized (model will be tested on first use)');
     } catch (error) {
-      console.log('❌ Failed to initialize Gemini AI, using mock service:', error);
+      console.log('[Error] Failed to initialize Gemini AI, using mock service:', error);
       this.mockService = new MockGeminiService();
     }
   }
@@ -58,13 +58,13 @@ export class GeminiService {
     const modelName = 'gemini-2.0-flash';
 
     try {
-      console.log(`🚀 Initializing Gemini model: ${modelName}`);
+      console.log(`[Starting] Initializing Gemini model: ${modelName}`);
       this.model = this.genAI.getGenerativeModel({ model: modelName });
       this.modelInitialized = true;
-      console.log(`✅ Gemini AI model initialized: ${modelName}`);
+      console.log(`[Success] Gemini AI model initialized: ${modelName}`);
       return;
     } catch (modelError: any) {
-      console.log(`❌ Failed to initialize ${modelName}: ${modelError.message || modelError}`);
+      console.log(`[Error] Failed to initialize ${modelName}: ${modelError.message || modelError}`);
       throw new Error(`Failed to initialize Gemini model: ${modelError.message}`);
     }
   }
@@ -72,12 +72,12 @@ export class GeminiService {
   private async listAvailableModels() {
     try {
       const models = await this.genAI.listModels();
-      console.log('📋 Available models:');
+      console.log('[Project] Available models:');
       models.forEach((model: any) => {
         console.log(`  - ${model.name} (${model.displayName})`);
       });
     } catch (error) {
-      console.log('❌ Could not list models:', error);
+      console.log('[Error] Could not list models:', error);
     }
   }
 
@@ -90,7 +90,7 @@ export class GeminiService {
     try {
       await this.ensureModelInitialized();
     } catch (error) {
-      console.log('❌ Failed to initialize working model, using enhanced fallback');
+      console.log('[Error] Failed to initialize working model, using enhanced fallback');
       // Use the enhanced MockGeminiService instead of basic fallback
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
@@ -101,20 +101,20 @@ export class GeminiService {
     const prompt = this.createProjectAnalysisPrompt(brief);
 
     try {
-      console.log('🤖 Analyzing project with Gemini AI...');
+      console.log('[AI] Analyzing project with Gemini AI...');
       const result = await this.model.generateContent(prompt);
       const response = result.response.text();
 
       // Parse the AI response and extract tasks
       const tasks = this.parseTasksFromResponse(response);
 
-      console.log(`✅ Gemini generated ${tasks.length} technical tasks`);
+      console.log(`[Success] Gemini generated ${tasks.length} technical tasks`);
       return tasks;
 
     } catch (error) {
-      console.error('❌ Gemini AI error:', error);
+      console.error('[Error] Gemini AI error:', error);
       // Use enhanced MockGeminiService instead of basic fallback
-      console.log('🔄 Using enhanced fallback service...');
+      console.log('[Fallback] Using enhanced fallback service...');
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
       }
@@ -134,7 +134,7 @@ export class GeminiService {
     try {
       await this.ensureModelInitialized();
     } catch (error) {
-      console.log('❌ Failed to initialize working model for code generation, using enhanced fallback');
+      console.log('[Error] Failed to initialize working model for code generation, using enhanced fallback');
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
       }
@@ -144,15 +144,15 @@ export class GeminiService {
     const prompt = this.createCodeGenerationPrompt(task, agentType);
 
     try {
-      console.log(`🎨 Generating ${agentType} code with Gemini AI...`);
+      console.log(`[Frontend] Generating ${agentType} code with Gemini AI...`);
       const result = await this.model.generateContent(prompt);
       const response = result.response.text();
 
       return this.parseCodeFromResponse(response, agentType);
 
     } catch (error) {
-      console.error(`❌ Gemini code generation error:`, error);
-      console.log('🔄 Using enhanced fallback for code generation...');
+      console.error(`[Error] Gemini code generation error:`, error);
+      console.log('[Fallback] Using enhanced fallback for code generation...');
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
       }
@@ -169,7 +169,7 @@ export class GeminiService {
     try {
       await this.ensureModelInitialized();
     } catch (error) {
-      console.log('❌ Failed to initialize working model for task enhancement, using enhanced fallback');
+      console.log('[Error] Failed to initialize working model for task enhancement, using enhanced fallback');
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
       }
@@ -205,8 +205,8 @@ Format as JSON with fields: title, description, acceptance_criteria, estimated_h
       };
 
     } catch (error) {
-      console.error('❌ Task enhancement error:', error);
-      console.log('🔄 Using enhanced fallback for task enhancement...');
+      console.error('[Error] Task enhancement error:', error);
+      console.log('[Fallback] Using enhanced fallback for task enhancement...');
       if (!this.mockService) {
         this.mockService = new MockGeminiService();
       }
@@ -344,7 +344,7 @@ Generate 2-4 related files that implement the task requirements.
       }));
 
     } catch (error) {
-      console.error('❌ Failed to parse AI response:', error);
+      console.error('[Error] Failed to parse AI response:', error);
       throw new Error('Failed to parse AI-generated tasks');
     }
   }
@@ -400,7 +400,7 @@ Generate 2-4 related files that implement the task requirements.
   }
 
   private fallbackTaskGeneration(brief: ProjectBrief): TechnicalTask[] {
-    console.log('🔄 Using fallback task generation...');
+    console.log('[Fallback] Using fallback task generation...');
 
     const tasks: TechnicalTask[] = [];
     const description = brief.description.toLowerCase();

@@ -1,9 +1,6 @@
 import { TechnicalTask, GeneratedFile } from '../types';
 
 export class BusinessLogicGenerator {
-  /**
-   * Generate business logic workflow files based on project requirements
-   */
   static generateBusinessLogicFiles(task: TechnicalTask): GeneratedFile[] {
     const files: GeneratedFile[] = [];
     const taskLower = task.title.toLowerCase();
@@ -46,19 +43,10 @@ export class BusinessLogicGenerator {
 import { notificationService } from './notificationService';
 import { auditLogService } from './auditLogService';
 
-/**
- * Task management business logic
- * Handles complex task operations with proper validation and side effects
- */
 export class TaskService {
-  /**
-   * Create a new task with validation and notifications
-   */
   async createTask(userId: string, taskData: CreateTaskData): Promise<Task> {
-    // Validate task data
     this.validateTaskData(taskData);
 
-    // Create task in database
     const task = await db.tasks.create({
       ...taskData,
       userId,
@@ -76,7 +64,6 @@ export class TaskService {
       changes: taskData
     });
 
-    // Send notification if task is assigned to someone
     if (taskData.assignedTo && taskData.assignedTo !== userId) {
       await notificationService.notifyTaskAssigned(taskData.assignedTo, task);
     }
@@ -84,40 +71,31 @@ export class TaskService {
     return task;
   }
 
-  /**
-   * Assign task to a user with validation
-   */
   async assignTask(taskId: string, assignedTo: string, assignedBy: string): Promise<Task> {
-    // Get task
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // Check permissions
     if (task.userId !== assignedBy && task.assignedTo !== assignedBy) {
       throw new Error('You do not have permission to assign this task');
     }
 
-    // Cannot assign to yourself if you're the creator
     if (task.userId === assignedTo && assignedBy === task.userId) {
       throw new Error('Cannot assign task to yourself as the creator');
     }
 
-    // Check if target user exists and is active
     const targetUser = await db.users.findById(assignedTo);
     if (!targetUser || !targetUser.isActive) {
       throw new Error('Target user not found or inactive');
     }
 
-    // Update task
     const previousAssignee = task.assignedTo;
     const updatedTask = await db.tasks.update(taskId, {
       assignedTo,
       updatedAt: new Date()
     });
 
-    // Log audit trail
     await auditLogService.log({
       userId: assignedBy,
       action: 'task_assigned',
@@ -129,10 +107,8 @@ export class TaskService {
       }
     });
 
-    // Notify new assignee
     await notificationService.notifyTaskAssigned(assignedTo, updatedTask);
 
-    // Notify previous assignee if exists
     if (previousAssignee && previousAssignee !== assignedTo) {
       await notificationService.notifyTaskUnassigned(previousAssignee, updatedTask);
     }
@@ -140,28 +116,22 @@ export class TaskService {
     return updatedTask;
   }
 
-  /**
-   * Complete a task with validation and side effects
-   */
   async completeTask(taskId: string, userId: string): Promise<Task> {
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // Only assigned user or creator can complete
     if (task.assignedTo !== userId && task.userId !== userId) {
       throw new Error('You do not have permission to complete this task');
     }
 
-    // Check if all subtasks are completed
     const subtasks = await db.tasks.findByParentId(taskId);
     const incompleteSubtasks = subtasks.filter(st => st.status !== 'completed');
     if (incompleteSubtasks.length > 0) {
       throw new Error(\`Complete all \${incompleteSubtasks.length} subtask(s) first\`);
     }
 
-    // Update task
     const updatedTask = await db.tasks.update(taskId, {
       status: 'completed',
       completedAt: new Date(),
@@ -177,12 +147,12 @@ export class TaskService {
       changes: { status: 'completed' }
     });
 
-    // Notify task creator if different from completer
+
     if (task.userId !== userId) {
       await notificationService.notifyTaskCompleted(task.userId, updatedTask);
     }
 
-    // Update user statistics
+
     await this.updateUserStatistics(userId);
 
     // Unblock dependent tasks
@@ -191,23 +161,20 @@ export class TaskService {
     return updatedTask;
   }
 
-  /**
-   * Update task priority with escalation rules
-   */
   async updateTaskPriority(taskId: string, priority: TaskPriority, userId: string): Promise<Task> {
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // Check permissions
+
     if (task.userId !== userId && task.assignedTo !== userId) {
       throw new Error('You do not have permission to update this task');
     }
 
     const previousPriority = task.priority;
 
-    // Update task
+
     const updatedTask = await db.tasks.update(taskId, {
       priority,
       updatedAt: new Date()
@@ -233,9 +200,6 @@ export class TaskService {
     return updatedTask;
   }
 
-  /**
-   * Check and escalate overdue high-priority tasks
-   */
   async checkTaskEscalation(taskId: string): Promise<void> {
     const task = await db.tasks.findById(taskId);
     if (!task) return;
@@ -251,7 +215,7 @@ export class TaskService {
         updatedAt: now
       });
 
-      // Add system comment
+
       await db.comments.create({
         taskId,
         userId: 'system',
@@ -259,7 +223,7 @@ export class TaskService {
         createdAt: now
       });
 
-      // Notify manager and assignee
+
       await notificationService.notifyTaskEscalated(task, 'Task is overdue and has been escalated');
 
       // Log audit trail
@@ -273,9 +237,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Delete task with cascading effects
-   */
   async deleteTask(taskId: string, userId: string): Promise<void> {
     const task = await db.tasks.findById(taskId);
     if (!task) {
@@ -287,7 +248,7 @@ export class TaskService {
       throw new Error('Only the task creator can delete this task');
     }
 
-    // Check if task has dependencies
+
     const dependentTasks = await db.tasks.findDependentTasks(taskId);
     if (dependentTasks.length > 0) {
       throw new Error(\`Cannot delete task with \${dependentTasks.length} dependent task(s)\`);
@@ -305,15 +266,12 @@ export class TaskService {
       changes: { deletedAt: new Date() }
     });
 
-    // Notify assigned user if exists
+
     if (task.assignedTo) {
       await notificationService.notifyTaskDeleted(task.assignedTo, task);
     }
   }
 
-  /**
-   * Get tasks due tomorrow
-   */
   async getTasksDueTomorrow(): Promise<Task[]> {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -325,17 +283,11 @@ export class TaskService {
     return await db.tasks.findByDueDateRange(tomorrow, dayAfterTomorrow);
   }
 
-  /**
-   * Get overdue tasks
-   */
   async getOverdueTasks(): Promise<Task[]> {
     const now = new Date();
     return await db.tasks.findOverdue(now);
   }
 
-  /**
-   * Validate task data
-   */
   private validateTaskData(taskData: CreateTaskData): void {
     if (!taskData.title || taskData.title.trim().length === 0) {
       throw new Error('Task title is required');
@@ -358,9 +310,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Update user task completion statistics
-   */
   private async updateUserStatistics(userId: string): Promise<void> {
     const completedCount = await db.tasks.countCompletedByUser(userId);
     await db.users.update(userId, {
@@ -368,14 +317,11 @@ export class TaskService {
     });
   }
 
-  /**
-   * Unblock tasks that were waiting for this task
-   */
   private async unblockDependentTasks(taskId: string): Promise<void> {
     const dependentTasks = await db.tasks.findDependentTasks(taskId);
 
     for (const depTask of dependentTasks) {
-      // Check if all dependencies are now completed
+
       const allDepsCompleted = await this.areAllDependenciesCompleted(depTask.id);
 
       if (allDepsCompleted) {
@@ -384,7 +330,7 @@ export class TaskService {
           updatedAt: new Date()
         });
 
-        // Notify assignee
+
         if (depTask.assignedTo) {
           await notificationService.notifyTaskUnblocked(depTask.assignedTo, depTask);
         }
@@ -392,9 +338,6 @@ export class TaskService {
     }
   }
 
-  /**
-   * Check if all task dependencies are completed
-   */
   private async areAllDependenciesCompleted(taskId: string): Promise<boolean> {
     const task = await db.tasks.findById(taskId);
     if (!task || !task.dependencies || task.dependencies.length === 0) {
@@ -462,13 +405,13 @@ export class SharingService {
     userIds: string[],
     permission: SharePermission = 'view'
   ): Promise<void> {
-    // Get task
+
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // Check if sharer has permission
+
     if (task.userId !== sharedBy && task.assignedTo !== sharedBy) {
       throw new Error('You do not have permission to share this task');
     }
@@ -479,13 +422,13 @@ export class SharingService {
       throw new Error('One or more users not found');
     }
 
-    // Create shares
+
     for (const userId of userIds) {
-      // Check if already shared
+
       const existingShare = await db.taskShares.findByTaskAndUser(taskId, userId);
 
       if (existingShare) {
-        // Update permission if different
+
         if (existingShare.permission !== permission) {
           await db.taskShares.update(existingShare.id, {
             permission,
@@ -493,7 +436,7 @@ export class SharingService {
           });
         }
       } else {
-        // Create new share
+
         await db.taskShares.create({
           taskId,
           userId,
@@ -502,7 +445,7 @@ export class SharingService {
           createdAt: new Date()
         });
 
-        // Notify user
+
         await notificationService.notifyTaskShared(userId, task, sharedBy, permission);
 
         // Log audit trail
@@ -526,12 +469,12 @@ export class SharingService {
       throw new Error('Task not found');
     }
 
-    // Check permissions
+
     if (task.userId !== revokedBy) {
       throw new Error('Only the task owner can revoke sharing');
     }
 
-    // Find and delete share
+
     const share = await db.taskShares.findByTaskAndUser(taskId, userId);
     if (!share) {
       throw new Error('Share not found');
@@ -539,7 +482,7 @@ export class SharingService {
 
     await db.taskShares.delete(share.id);
 
-    // Notify user
+
     await notificationService.notifyShareRevoked(userId, task);
 
     // Log audit trail
@@ -564,7 +507,7 @@ export class SharingService {
       return true;
     }
 
-    // Check if shared
+
     const share = await db.taskShares.findByTaskAndUser(taskId, userId);
     return !!share;
   }
@@ -585,7 +528,7 @@ export class SharingService {
       return true;
     }
 
-    // Check share permission
+
     const share = await db.taskShares.findByTaskAndUser(taskId, userId);
     if (!share) return false;
 
@@ -610,7 +553,7 @@ export class SharingService {
 
     const collaborators: TaskCollaborator[] = [];
 
-    // Add owner
+
     const owner = await db.users.findById(task.userId);
     if (owner) {
       collaborators.push({
@@ -620,7 +563,7 @@ export class SharingService {
       });
     }
 
-    // Add assignee if different from owner
+
     if (task.assignedTo && task.assignedTo !== task.userId) {
       const assignee = await db.users.findById(task.assignedTo);
       if (assignee) {
@@ -632,7 +575,7 @@ export class SharingService {
       }
     }
 
-    // Add shared users
+
     const shares = await db.taskShares.findByTask(taskId);
     for (const share of shares) {
       const user = await db.users.findById(share.userId);
@@ -729,23 +672,23 @@ export class NotificationService {
    * Notify about task escalation
    */
   async notifyTaskEscalated(task: any, reason: string): Promise<void> {
-    // Notify assignee
+
     if (task.assignedTo) {
       await this.createNotification({
         userId: task.assignedTo,
         type: 'task_escalated',
-        title: '🚨 Task Escalated',
+        title: 'Task Escalated',
         message: \`Task "\${task.title}" has been escalated: \${reason}\`,
         referenceId: task.id
       });
     }
 
-    // Notify creator
+
     if (task.userId && task.userId !== task.assignedTo) {
       await this.createNotification({
         userId: task.userId,
         type: 'task_escalated',
-        title: '🚨 Task Escalated',
+        title: 'Task Escalated',
         message: \`Your task "\${task.title}" has been escalated: \${reason}\`,
         referenceId: task.id
       });
@@ -920,13 +863,13 @@ export class CommentService {
    * Add comment to task
    */
   async addComment(taskId: string, userId: string, content: string, parentCommentId?: string): Promise<Comment> {
-    // Check task exists
+
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // Check user has permission to comment
+
     const hasPermission = await sharingService.hasPermission(taskId, userId, 'comment');
     if (!hasPermission) {
       throw new Error('You do not have permission to comment on this task');
@@ -949,7 +892,7 @@ export class CommentService {
       }
     }
 
-    // Create comment
+
     const comment = await db.comments.create({
       taskId,
       userId,
@@ -959,7 +902,7 @@ export class CommentService {
       updatedAt: new Date()
     });
 
-    // Update task activity
+
     await db.tasks.update(taskId, {
       lastActivityAt: new Date()
     });
@@ -973,7 +916,7 @@ export class CommentService {
       changes: { commentId: comment.id }
     });
 
-    // Notify task participants
+
     await this.notifyTaskParticipants(taskId, userId, task);
 
     // If replying to someone, notify them specifically
@@ -1006,7 +949,7 @@ export class CommentService {
       throw new Error('Comment content is required');
     }
 
-    // Update comment
+
     const updated = await db.comments.update(commentId, {
       content: newContent.trim(),
       updatedAt: new Date(),
@@ -1034,7 +977,7 @@ export class CommentService {
       throw new Error('Comment not found');
     }
 
-    // Check task
+
     const task = await db.tasks.findById(comment.taskId);
     if (!task) {
       throw new Error('Task not found');
@@ -1045,7 +988,7 @@ export class CommentService {
       throw new Error('You do not have permission to delete this comment');
     }
 
-    // Check for replies
+
     const replies = await db.comments.findReplies(commentId);
     if (replies.length > 0) {
       // Soft delete with placeholder text
@@ -1072,13 +1015,13 @@ export class CommentService {
    * Get comments for a task with threading
    */
   async getTaskComments(taskId: string, userId: string): Promise<ThreadedComment[]> {
-    // Check access
+
     const hasAccess = await sharingService.canAccessTask(taskId, userId);
     if (!hasAccess) {
       throw new Error('You do not have access to this task');
     }
 
-    // Get all comments
+
     const comments = await db.comments.findByTask(taskId);
 
     // Build threaded structure
@@ -1208,7 +1151,7 @@ export class FileService {
     userId: string,
     file: FileUpload
   ): Promise<Attachment> {
-    // Check task exists and user has permission
+
     const task = await db.tasks.findById(taskId);
     if (!task) {
       throw new Error('Task not found');
@@ -1230,7 +1173,7 @@ export class FileService {
     // Save file
     await fs.writeFile(filePath, file.buffer);
 
-    // Create attachment record
+
     const attachment = await db.attachments.create({
       taskId,
       userId,
@@ -1272,7 +1215,7 @@ export class FileService {
       throw new Error('Attachment not found');
     }
 
-    // Check access to task
+
     const hasAccess = await sharingService.canAccessTask(attachment.taskId, userId);
     if (!hasAccess) {
       throw new Error('You do not have access to this file');
@@ -1280,7 +1223,7 @@ export class FileService {
 
     const fullPath = path.join(this.uploadDir, attachment.filePath);
 
-    // Check file exists
+
     try {
       await fs.access(fullPath);
     } catch {
@@ -1312,7 +1255,7 @@ export class FileService {
       throw new Error('You do not have permission to delete this file');
     }
 
-    // Delete from disk
+
     const fullPath = path.join(this.uploadDir, attachment.filePath);
     try {
       await fs.unlink(fullPath);
@@ -1320,7 +1263,7 @@ export class FileService {
       console.warn(\`Failed to delete file from disk: \${fullPath}\`, error);
     }
 
-    // Delete from database
+
     await db.attachments.delete(attachmentId);
 
     // Log audit trail
@@ -1372,17 +1315,17 @@ export class FileService {
    * Validate file before upload
    */
   private validateFile(file: FileUpload): void {
-    // Check file size
+
     if (file.size > this.maxFileSize) {
       throw new Error(\`File too large. Maximum size is \${this.maxFileSize / 1024 / 1024}MB\`);
     }
 
-    // Check mime type
+
     if (!this.allowedMimeTypes.includes(file.mimeType)) {
       throw new Error(\`File type not allowed: \${file.mimeType}\`);
     }
 
-    // Check file name
+
     if (!file.originalName || file.originalName.length > 255) {
       throw new Error('Invalid file name');
     }

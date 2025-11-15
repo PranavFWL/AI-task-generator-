@@ -21,9 +21,9 @@ export class AIAgentSystem {
     aiAnalysis?: string;
     aiInsights?: string;
   }> {
-    console.log('🤖 Enhanced AI Agent System - Processing project brief...');
-    console.log(`📋 Project: ${brief.description}`);
-    console.log(`🧠 AI Mode: ${this.useAI ? 'ENABLED' : 'DISABLED'}`);
+    console.log('[AI] Enhanced AI Agent System - Processing project brief...');
+    console.log(`[Project] Project: ${brief.description}`);
+    console.log(`[System] AI Mode: ${this.useAI ? 'ENABLED' : 'DISABLED'}`);
 
     try {
       if (this.useAI) {
@@ -32,7 +32,7 @@ export class AIAgentSystem {
         return await this.processWithFallback(brief);
       }
     } catch (error) {
-      console.warn('⚠️ AI processing failed, switching to fallback mode...');
+      console.warn('[Warning] AI processing failed, switching to fallback mode...');
       return await this.processWithFallback(brief);
     }
   }
@@ -45,25 +45,25 @@ export class AIAgentSystem {
     aiAnalysis: string;
     aiInsights: string;
   }> {
-    console.log('🚀 Using AI-powered processing...');
+    console.log('[Starting] Using AI-powered processing...');
 
     // Break down the project with AI analysis
     const { tasks, executionPlan, aiAnalysis } = await this.aiCoordinator.processProjectBrief(brief);
 
-    console.log(`\n📊 AI generated ${tasks.length} enhanced technical tasks:`);
+    console.log(`\n[Data] AI generated ${tasks.length} enhanced technical tasks:`);
     tasks.forEach((task, index) => {
       console.log(`  ${index + 1}. [${task.type.toUpperCase()}] ${task.title} (${task.priority} priority)`);
       if (task.estimatedHours) {
-        console.log(`     ⏱️ Estimated: ${task.estimatedHours} hours`);
+        console.log(`     Est: Estimated: ${task.estimatedHours} hours`);
       }
     });
 
-    console.log('\n⚡ Executing AI-enhanced tasks...');
+    console.log('\n[Executing] Executing AI-enhanced tasks...');
 
     // Execute the project with AI
     const { results, summary, aiInsights } = await this.aiCoordinator.executeProject(brief);
 
-    console.log('\n✅ AI project execution completed!');
+    console.log('\n[Success] AI project execution completed!');
     console.log(summary);
 
     return {
@@ -82,22 +82,22 @@ export class AIAgentSystem {
     results: AgentResponse[];
     summary: string;
   }> {
-    console.log('🔄 Using fallback processing...');
+    console.log('[Fallback] Using fallback processing...');
 
     // Break down the project using rule-based approach
     const { tasks, executionPlan } = await this.fallbackCoordinator.processProjectBrief(brief);
 
-    console.log(`\n📊 Generated ${tasks.length} technical tasks:`);
+    console.log(`\n[Data] Generated ${tasks.length} technical tasks:`);
     tasks.forEach((task, index) => {
       console.log(`  ${index + 1}. [${task.type.toUpperCase()}] ${task.title}`);
     });
 
-    console.log('\n⚡ Executing tasks...');
+    console.log('\n[Executing] Executing tasks...');
 
     // Execute the project
     const { results, summary } = await this.fallbackCoordinator.executeProject(brief);
 
-    console.log('\n✅ Project execution completed!');
+    console.log('\n[Success] Project execution completed!');
     console.log(summary);
 
     return {
@@ -113,44 +113,44 @@ export class AIAgentSystem {
     executionPlan: string;
     aiAnalysis?: string;
   }> {
-    console.log('🧠 Enhanced AI Agent System - Analyzing project brief...');
+    console.log('[System] Enhanced AI Agent System - Analyzing project brief...');
 
     try {
       if (this.useAI) {
-        console.log('🤖 Using AI analysis...');
+        console.log('[AI] Using AI analysis...');
         return await this.aiCoordinator.processProjectBrief(brief);
       } else {
-        console.log('🔄 Using rule-based analysis...');
+        console.log('[Fallback] Using rule-based analysis...');
         return await this.fallbackCoordinator.processProjectBrief(brief);
       }
     } catch (error) {
-      console.warn('⚠️ AI analysis failed, using fallback...');
+      console.warn('[Warning] AI analysis failed, using fallback...');
       return await this.fallbackCoordinator.processProjectBrief(brief);
     }
   }
 
   async executeSpecificTasks(tasks: TechnicalTask[]): Promise<AgentResponse[]> {
-    console.log('🚀 Enhanced AI Agent System - Executing specific tasks...');
+    console.log('[Starting] Enhanced AI Agent System - Executing specific tasks...');
 
     const results: AgentResponse[] = [];
     const coordinator = this.useAI ? this.aiCoordinator : this.fallbackCoordinator;
 
     for (const task of tasks) {
-      console.log(`\n🔧 Processing: ${task.title}`);
+      console.log(`\n[Processing] Processing: ${task.title}`);
       try {
         const result = await coordinator.executeTask(task);
         results.push(result);
 
         if (result.success) {
-          console.log(`✅ Task completed successfully`);
+          console.log(`[Success] Task completed successfully`);
           if (result.files && result.files.length > 0) {
-            console.log(`📁 Generated ${result.files.length} files`);
+            console.log(`[Files] Generated ${result.files.length} files`);
           }
         } else {
-          console.log(`❌ Task failed: ${result.error}`);
+          console.log(`[Error] Task failed: ${result.error}`);
         }
       } catch (error) {
-        console.log(`💥 Task error: ${error}`);
+        console.log(`[Error] Task error: ${error}`);
         results.push({
           success: false,
           output: '',
@@ -165,7 +165,7 @@ export class AIAgentSystem {
   // Switch between AI and fallback modes
   setAIMode(enabled: boolean): void {
     this.useAI = enabled;
-    console.log(`🔄 AI mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`[Fallback] AI mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
   }
 
   // Get system status
@@ -189,10 +189,10 @@ export class AIAgentSystem {
       };
 
       await this.aiCoordinator.processProjectBrief(testBrief);
-      console.log('✅ AI connection test successful');
+      console.log('[Success] AI connection test successful');
       return true;
     } catch (error) {
-      console.log('❌ AI connection test failed:', error);
+      console.log('[Error] AI connection test failed:', error);
       return false;
     }
   }
