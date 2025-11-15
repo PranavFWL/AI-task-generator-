@@ -2,7 +2,7 @@
 
 AI Powered Project Task Breakdown System
 
-AgentTask-AI is a modern web application that uses Google Gemini AI to convert high-level project briefs into detailed, actionable technical tasks. It works on a multi-agent system where each AI agent focuses on a specific domain such as coordination, frontend, or backend.
+AgentTask-AI is a modern web application built with **Google ADK (Agent Development Kit)** that uses Google Gemini AI to convert high-level project briefs into detailed, actionable technical tasks. It works on a multi-agent system where each AI agent focuses on a specific domain such as coordination, frontend, or backend.
 
 ---
 
@@ -53,13 +53,14 @@ The installation script checks dependencies, installs all required packages, and
 2. Configure environment
 
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
 
-   Add your Gemini API key inside `.env.local`
+   Add your Gemini API key inside `.env`
 
    ```
    GEMINI_API_KEY=your_api_key_here
+   GOOGLE_API_KEY=your_api_key_here
    ```
 
 3. Run
@@ -75,7 +76,7 @@ The installation script checks dependencies, installs all required packages, and
 ## How It Works
 
 1. The user provides a natural language project description.
-2. Gemini AI analyzes the description and breaks it down into technical tasks.
+2. Google ADK multi-agent system analyzes the description and breaks it down into technical tasks.
 3. The Coordinator Agent manages dependencies and assigns tasks.
 4. The Frontend and Backend Agents generate production-level code.
 5. The entire project is packaged into a downloadable full-stack application.
@@ -101,6 +102,7 @@ Backend
 
 AI Integration
 
+* Google ADK (Agent Development Kit) v0.1.3
 * Google Gemini API
 
 ---
