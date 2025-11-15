@@ -91,7 +91,7 @@ export default function Home() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 AgentTask AI
               </h1>
-              <p className="text-sm text-slate-600">Transform ideas into actionable tasks</p>
+              <p className="text-sm text-slate-600">Powered by Google ADK • Transform ideas into actionable tasks</p>
             </div>
           </div>
         </div>

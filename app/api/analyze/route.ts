@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIAgentSystem } from '@/lib/AIAgentSystem';
 import { ADKAgentSystem } from '@/lib/parent/ADKAgentSystem';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { description, requirements, constraints, useADK = false } = body;
+    const { description, requirements, constraints, useADK = true } = body;
 
     if (!description || typeof description !== 'string') {
       return NextResponse.json(
@@ -14,12 +13,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`🤖 Using ${useADK ? 'Google ADK' : 'Legacy'} Agent System`);
+    console.log(`🤖 Using Google ADK Agent System`);
 
-    // Initialize the appropriate Agent System
-    const agentSystem = useADK
-      ? new ADKAgentSystem(true)
-      : new AIAgentSystem(true);
+    // Initialize Google ADK Agent System
+    const agentSystem = new ADKAgentSystem(true);
 
     // Create project brief
     const projectBrief = {
@@ -50,8 +47,8 @@ export async function POST(request: NextRequest) {
       projectSummary: description,
       generatedFiles: generatedFiles,
       summary: result.summary,
-      framework: useADK ? 'Google ADK v0.1.2' : 'Legacy System',
-      agentSystem: useADK ? 'Google Agent Development Kit (Multi-Agent)' : 'Custom Multi-Agent',
+      framework: 'Google ADK v0.1.3',
+      agentSystem: 'Google Agent Development Kit (Multi-Agent)',
       totalFiles: generatedFiles.length
     });
   } catch (error) {

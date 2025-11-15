@@ -10,6 +10,12 @@ export class ADKFrontendAgent {
   private agent: LlmAgent;
 
   constructor() {
+    // Ensure API key is available
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_API_KEY or GEMINI_API_KEY must be set in environment variables');
+    }
+
     // Create the ADK agent with specific instructions for frontend development
     this.agent = new LlmAgent({
       name: 'frontend_code_generator',
@@ -78,9 +84,9 @@ Generate complete, production-ready code with all necessary files.`,
 
       // Create session before running
       await sessionService.createSession({
+        appName: 'adk-frontend-agent',
         userId,
-        sessionId,
-        agentId: this.agent.name
+        sessionId
       });
 
       const runner = new Runner({
