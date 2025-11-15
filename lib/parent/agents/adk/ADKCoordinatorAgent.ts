@@ -14,7 +14,18 @@ export class ADKCoordinatorAgent {
   private backendAgent: ADKBackendAgent;
 
   constructor() {
+    // Ensure API key is available
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    console.log(`[ADK] API Key status: ${apiKey ? `Found (length: ${apiKey.length})` : 'NOT FOUND'}`);
+
+    if (!apiKey) {
+      console.error('[ADK] ERROR: No API key found in environment variables');
+      console.error('[ADK] Checked: GOOGLE_API_KEY and GEMINI_API_KEY');
+      throw new Error('GOOGLE_API_KEY or GEMINI_API_KEY must be set in environment variables');
+    }
+
     // Create planner agent for task breakdown
+    console.log('[ADK] Initializing planner agent with Gemini...');
     this.plannerAgent = new LlmAgent({
       name: 'project_planner',
       description: 'Expert software architect for breaking down projects into technical tasks',
@@ -84,9 +95,9 @@ Important:
 
       // Create session before running
       await sessionService.createSession({
+        appName: 'adk-coordinator',
         userId,
-        sessionId,
-        agentId: this.plannerAgent.name
+        sessionId
       });
 
       const runner = new Runner({
@@ -97,6 +108,8 @@ Important:
 
       // Run the ADK planner agent and collect events
       let responseContent = '';
+      console.log('[ADK] Starting ADK runner...');
+
       for await (const event of runner.runAsync({
         userId,
         sessionId,
@@ -105,6 +118,8 @@ Important:
           parts: [{ text: prompt }]
         }
       })) {
+        console.log(`[ADK] Event received from: ${event.author}`);
+
         if (event.author === this.plannerAgent.name && event.content) {
           const parts = event.content.parts || [];
           for (const part of parts) {
@@ -114,6 +129,9 @@ Important:
           }
         }
       }
+
+      console.log('[ADK] Response content length:', responseContent.length);
+      console.log('[ADK] Response preview:', responseContent.substring(0, 200));
 
       // Parse the response
       const result = this.parseTasksFromResponse(responseContent);
@@ -131,16 +149,10 @@ Important:
 
     } catch (error) {
       console.error('[Error] ADK Coordinator error:', error);
+      console.error('[Error] Full error details:', JSON.stringify(error, null, 2));
 
-      // Fallback to basic task generation
-      const fallbackTasks = this.generateFallbackTasks(brief);
-      const executionPlan = this.createExecutionPlan(fallbackTasks, brief);
-
-      return {
-        tasks: fallbackTasks,
-        executionPlan,
-        aiAnalysis: 'Used fallback task generation due to error'
-      };
+      // No fallback - throw error to show what's wrong
+      throw new Error(`ADK processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

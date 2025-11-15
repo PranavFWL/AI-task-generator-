@@ -50,7 +50,7 @@ const safeToString = (value: any): string => {
 };
 
 // Format description with proper paragraphs and bullet points
-const formatDescription = (text: string): JSX.Element => {
+const formatDescription = (text: string): React.ReactElement => {
   if (!text) return <></>;
 
   const lines = text.split('\n').filter(line => line.trim());

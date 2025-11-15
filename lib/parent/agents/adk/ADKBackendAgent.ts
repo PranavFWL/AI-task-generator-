@@ -10,6 +10,12 @@ export class ADKBackendAgent {
   private agent: LlmAgent;
 
   constructor() {
+    // Ensure API key is available
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_API_KEY or GEMINI_API_KEY must be set in environment variables');
+    }
+
     this.agent = new LlmAgent({
       name: 'backend_api_generator',
       description: 'Expert Node.js/Express backend developer specializing in RESTful APIs',
@@ -89,9 +95,9 @@ Generate complete, production-ready backend code.`,
 
       // Create session before running
       await sessionService.createSession({
+        appName: 'adk-backend-agent',
         userId,
-        sessionId,
-        agentId: this.agent.name
+        sessionId
       });
 
       const runner = new Runner({
