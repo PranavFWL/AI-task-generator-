@@ -19,7 +19,7 @@ export class AIFrontendAgent extends BaseAgent {
       };
     }
 
-    console.log(`🎨 AI Frontend Agent processing: ${task.title}`);
+    console.log(`[Frontend] AI Frontend Agent processing: ${task.title}`);
 
     try {
       // Use AI to generate code
@@ -30,7 +30,7 @@ export class AIFrontendAgent extends BaseAgent {
 
       const output = this.generateTaskOutput(task, processedFiles, aiResult.explanation);
 
-      console.log(`✅ AI Frontend generated ${processedFiles.length} files`);
+      console.log(`[Success] AI Frontend generated ${processedFiles.length} files`);
 
       return {
         success: true,
@@ -39,7 +39,7 @@ export class AIFrontendAgent extends BaseAgent {
       };
 
     } catch (error) {
-      console.warn(`⚠️ AI generation failed, using fallback for: ${task.title}`);
+      console.warn(`[Warning] AI generation failed, using fallback for: ${task.title}`);
 
       // Fallback to rule-based generation if AI fails
       try {
@@ -527,23 +527,23 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, onToggleTask }) => {
   }
 
   private generateTaskOutput(task: TechnicalTask, files: GeneratedFile[], explanation: string): string {
-    let output = `🤖 AI Frontend Agent - Task Completed: ${task.title}\n\n`;
-    output += `📊 Generated ${files.length} files:\n`;
+    let output = `[AI] AI Frontend Agent - Task Completed: ${task.title}\n\n`;
+    output += `[Data] Generated ${files.length} files:\n`;
 
     files.forEach(file => {
-      output += `• ${file.path} (${file.type})\n`;
+      output += `- ${file.path} (${file.type})\n`;
     });
 
-    output += `\n🎨 AI Enhancement Features:\n`;
-    output += `• TypeScript interfaces with proper typing\n`;
-    output += `• Error handling and loading states\n`;
-    output += `• Accessibility attributes (ARIA labels)\n`;
-    output += `• Responsive design considerations\n`;
-    output += `• Modern React patterns (hooks, functional components)\n`;
-    output += `• Component story files for documentation\n`;
+    output += `\n[Frontend] AI Enhancement Features:\n`;
+    output += `- TypeScript interfaces with proper typing\n`;
+    output += `- Error handling and loading states\n`;
+    output += `- Accessibility attributes (ARIA labels)\n`;
+    output += `- Responsive design considerations\n`;
+    output += `- Modern React patterns (hooks, functional components)\n`;
+    output += `- Component story files for documentation\n`;
 
     if (explanation) {
-      output += `\n🧠 AI Explanation:\n${explanation}\n`;
+      output += `\n[System] AI Explanation:\n${explanation}\n`;
     }
 
     return output;

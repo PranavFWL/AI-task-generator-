@@ -139,7 +139,7 @@ export class JobScheduler {
       );
 
       this.isRunning = true;
-      console.log(\`✅ Scheduler started with \${this.jobs.size} jobs\`);
+      console.log(\`[Success] Scheduler started with \${this.jobs.size} jobs\`);
       this.logScheduledJobs();
     } catch (error) {
       console.error('Failed to start scheduler:', error);
@@ -164,9 +164,9 @@ export class JobScheduler {
         try {
           await handler();
           const duration = Date.now() - startTime;
-          console.log(\`[CRON] ✅ Completed job: \${name} (Duration: \${duration}ms)\`);
+          console.log(\`[CRON] [Success] Completed job: \${name} (Duration: \${duration}ms)\`);
         } catch (error) {
-          console.error(\`[CRON] ❌ Job failed: \${name}\`, error);
+          console.error(\`[CRON] [Error] Job failed: \${name}\`, error);
           // Log error to monitoring system
           this.logJobError(name, error);
         }
@@ -192,7 +192,7 @@ export class JobScheduler {
 
     this.jobs.clear();
     this.isRunning = false;
-    console.log('✅ Scheduler stopped');
+    console.log('[Success] Scheduler stopped');
   }
 
   /**
@@ -228,14 +228,14 @@ export class JobScheduler {
     }
 
     await handler();
-    console.log(\`[MANUAL] ✅ Job completed: \${jobName}\`);
+    console.log(\`[MANUAL] [Success] Job completed: \${jobName}\`);
   }
 
   /**
    * Log all scheduled jobs with their schedules
    */
   private logScheduledJobs(): void {
-    console.log('\\n📋 Scheduled Jobs:');
+    console.log('\\n[Project] Scheduled Jobs:');
     console.log('━'.repeat(60));
 
     const jobDescriptions = [
@@ -250,7 +250,7 @@ export class JobScheduler {
 
     for (const job of jobDescriptions) {
       if (this.jobs.has(job.name)) {
-        console.log(\`  • \${job.name.padEnd(30)} | \${job.schedule.padEnd(25)} | \${job.description}\`);
+        console.log(\`  - \${job.name.padEnd(30)} | \${job.schedule.padEnd(25)} | \${job.description}\`);
       }
     }
     console.log('━'.repeat(60) + '\\n');
@@ -331,7 +331,7 @@ export const notificationJobs = {
         sentCount++;
       }
 
-      console.log(\`✅ Sent \${sentCount} reminder emails\`);
+      console.log(\`[Success] Sent \${sentCount} reminder emails\`);
     } catch (error) {
       console.error('Failed to send daily reminders:', error);
       throw error;
@@ -342,7 +342,7 @@ export const notificationJobs = {
    * Send alerts for overdue tasks
    */
   async sendOverdueAlerts(): Promise<void> {
-    console.log('⚠️ Sending overdue task alerts...');
+    console.log('[Warning] Sending overdue task alerts...');
 
     try {
       const overdueTasks = await getOverdueTasks();
@@ -371,7 +371,7 @@ export const notificationJobs = {
 
         await sendEmail({
           to: user.email,
-          subject: \`⚠️ You have \${userTasks.length} overdue task(s)\`,
+          subject: \`[Warning] You have \${userTasks.length} overdue task(s)\`,
           html: this.generateOverdueEmail(user, userTasks),
           priority: 'high'
         });
@@ -379,7 +379,7 @@ export const notificationJobs = {
         sentCount++;
       }
 
-      console.log(\`✅ Sent \${sentCount} overdue alerts\`);
+      console.log(\`[Success] Sent \${sentCount} overdue alerts\`);
     } catch (error) {
       console.error('Failed to send overdue alerts:', error);
       throw error;
@@ -448,7 +448,7 @@ export const notificationJobs = {
         <body>
           <div class="container">
             <div class="header">
-              <h2>⚠️ Overdue Tasks Alert</h2>
+              <h2>[Warning] Overdue Tasks Alert</h2>
             </div>
             <p>Hi \${user.name},</p>
             <p>You have <strong>\${tasks.length}</strong> overdue task(s):</p>
@@ -497,7 +497,7 @@ export const cleanupJobs = {
 
       const deletedCount = await deleteOldCompletedTasks(cutoffDate);
 
-      console.log(\`✅ Cleaned up \${deletedCount} completed tasks older than \${daysOld} days\`);
+      console.log(\`[Success] Cleaned up \${deletedCount} completed tasks older than \${daysOld} days\`);
     } catch (error) {
       console.error('Failed to cleanup completed tasks:', error);
       throw error;
@@ -513,7 +513,7 @@ export const cleanupJobs = {
     try {
       const deletedCount = await deleteExpiredSessions();
 
-      console.log(\`✅ Cleaned up \${deletedCount} expired sessions\`);
+      console.log(\`[Success] Cleaned up \${deletedCount} expired sessions\`);
     } catch (error) {
       console.error('Failed to cleanup expired sessions:', error);
       throw error;
@@ -530,7 +530,7 @@ export const cleanupJobs = {
       // Implementation would check for files in storage that don't have database references
       const deletedCount = 0; // Placeholder
 
-      console.log(\`✅ Cleaned up \${deletedCount} orphaned attachments\`);
+      console.log(\`[Success] Cleaned up \${deletedCount} orphaned attachments\`);
     } catch (error) {
       console.error('Failed to cleanup orphaned attachments:', error);
       throw error;
@@ -557,7 +557,7 @@ export const reportJobs = {
    * Generate and send weekly productivity reports
    */
   async generateWeeklyReports(): Promise<void> {
-    console.log('📊 Generating weekly reports...');
+    console.log('[Data] Generating weekly reports...');
 
     try {
       const users = await getAllActiveUsers();
@@ -569,7 +569,7 @@ export const reportJobs = {
         if (report.totalTasks > 0) {
           await sendEmail({
             to: user.email,
-            subject: '📊 Your Weekly Productivity Report',
+            subject: '[Data] Your Weekly Productivity Report',
             html: this.generateWeeklyReportEmail(user, report)
           });
 
@@ -577,7 +577,7 @@ export const reportJobs = {
         }
       }
 
-      console.log(\`✅ Generated and sent \${generatedCount} weekly reports\`);
+      console.log(\`[Success] Generated and sent \${generatedCount} weekly reports\`);
     } catch (error) {
       console.error('Failed to generate weekly reports:', error);
       throw error;
@@ -588,7 +588,7 @@ export const reportJobs = {
    * Generate and send monthly analytics
    */
   async generateMonthlyAnalytics(): Promise<void> {
-    console.log('📊 Generating monthly analytics...');
+    console.log('[Data] Generating monthly analytics...');
 
     try {
       const users = await getAllActiveUsers();
@@ -599,14 +599,14 @@ export const reportJobs = {
 
         await sendEmail({
           to: user.email,
-          subject: '📈 Your Monthly Analytics Report',
+          subject: '[Stats] Your Monthly Analytics Report',
           html: this.generateMonthlyReportEmail(user, analytics)
         });
 
         generatedCount++;
       }
 
-      console.log(\`✅ Generated and sent \${generatedCount} monthly analytics\`);
+      console.log(\`[Success] Generated and sent \${generatedCount} monthly analytics\`);
     } catch (error) {
       console.error('Failed to generate monthly analytics:', error);
       throw error;
@@ -634,7 +634,7 @@ export const reportJobs = {
         <body>
           <div class="container">
             <div class="header">
-              <h2>📊 Weekly Productivity Report</h2>
+              <h2>[Data] Weekly Productivity Report</h2>
               <p>Week of \${new Date().toLocaleDateString()}</p>
             </div>
             <p>Hi \${user.name},</p>
@@ -682,7 +682,7 @@ export const reportJobs = {
         <body>
           <div class="container">
             <div class="header">
-              <h2>📈 Monthly Analytics Report</h2>
+              <h2>[Stats] Monthly Analytics Report</h2>
             </div>
             <p>Hi \${user.name},</p>
             <p>Your performance this month:</p>
@@ -758,7 +758,7 @@ export const backupJobs = {
       const stats = await fs.stat(backupFile);
       const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-      console.log(\`✅ Database backup completed: \${backupFile} (\${fileSizeMB} MB)\`);
+      console.log(\`[Success] Database backup completed: \${backupFile} (\${fileSizeMB} MB)\`);
 
       // Clean up old backups (keep last 7 days)
       await this.cleanupOldBackups(backupDir, 7);
@@ -892,19 +892,19 @@ notificationQueue.process(async (job) => {
  * Event listeners for queue monitoring
  */
 emailQueue.on('completed', (job, result) => {
-  console.log(\`[EMAIL QUEUE] ✅ Job \${job.id} completed\`, result);
+  console.log(\`[EMAIL QUEUE] [Success] Job \${job.id} completed\`, result);
 });
 
 emailQueue.on('failed', (job, error) => {
-  console.error(\`[EMAIL QUEUE] ❌ Job \${job?.id} failed\`, error);
+  console.error(\`[EMAIL QUEUE] [Error] Job \${job?.id} failed\`, error);
 });
 
 fileQueue.on('completed', (job, result) => {
-  console.log(\`[FILE QUEUE] ✅ Job \${job.id} completed\`, result);
+  console.log(\`[FILE QUEUE] [Success] Job \${job.id} completed\`, result);
 });
 
 fileQueue.on('failed', (job, error) => {
-  console.error(\`[FILE QUEUE] ❌ Job \${job?.id} failed\`, error);
+  console.error(\`[FILE QUEUE] [Error] Job \${job?.id} failed\`, error);
 });
 
 /**
@@ -954,7 +954,7 @@ export async function closeQueues(): Promise<void> {
     fileQueue.close(),
     notificationQueue.close()
   ]);
-  console.log('✅ All queues closed');
+  console.log('[Success] All queues closed');
 }
 `
     };

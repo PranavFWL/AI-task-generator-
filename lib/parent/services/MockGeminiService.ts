@@ -7,11 +7,11 @@ export class MockGeminiService {
   constructor() {
     // Check if we have the API key
     this.isConnected = !!process.env.GEMINI_API_KEY;
-    console.log(`🔄 Mock Gemini Service initialized (API Key: ${this.isConnected ? 'Present' : 'Missing'})`);
+    console.log(`[Fallback] Mock Gemini Service initialized (API Key: ${this.isConnected ? 'Present' : 'Missing'})`);
   }
 
   async analyzeProjectBrief(brief: ProjectBrief): Promise<TechnicalTask[]> {
-    console.log('🤖 Mock AI analyzing project brief...');
+    console.log('[AI] Mock AI analyzing project brief...');
 
     // Simulate AI processing time
     await this.delay(1000);
@@ -19,7 +19,7 @@ export class MockGeminiService {
     // Enhanced rule-based analysis that mimics AI behavior
     const tasks = this.generateEnhancedTasks(brief);
 
-    console.log(`✅ Mock AI generated ${tasks.length} enhanced technical tasks`);
+    console.log(`[Success] Mock AI generated ${tasks.length} enhanced technical tasks`);
     return tasks;
   }
 
@@ -27,7 +27,7 @@ export class MockGeminiService {
     files: Array<{path: string, content: string, type: string}>,
     explanation: string
   }> {
-    console.log(`🎨 Mock AI generating ${agentType} code...`);
+    console.log(`[Frontend] Mock AI generating ${agentType} code...`);
 
     // Simulate AI processing time
     await this.delay(800);
@@ -274,7 +274,7 @@ export class MockGeminiService {
 
     // FALLBACK: If no tasks generated, create generic project structure
     if (tasks.length === 0) {
-      console.log('⚠️ No keywords matched, generating comprehensive project tasks...');
+      console.log('[Warning] No keywords matched, generating comprehensive project tasks...');
 
       // Task 1: Database & Backend Architecture
       tasks.push({
@@ -282,14 +282,14 @@ export class MockGeminiService {
         title: 'Design Database Schema and Backend Architecture',
         description: `Build a scalable, secure backend foundation for the project. This includes:
 
-• Design normalized database schema with proper relationships and indexes
-• Set up database migrations and seeders for development
-• Create data models with validation rules
-• Implement database connection pooling and optimization
-• Design RESTful API architecture with versioning
-• Set up proper error handling and logging mechanisms
-• Configure environment-based settings (development, staging, production)
-• Implement health check and monitoring endpoints`,
+- Design normalized database schema with proper relationships and indexes
+- Set up database migrations and seeders for development
+- Create data models with validation rules
+- Implement database connection pooling and optimization
+- Design RESTful API architecture with versioning
+- Set up proper error handling and logging mechanisms
+- Configure environment-based settings (development, staging, production)
+- Implement health check and monitoring endpoints`,
         type: 'backend',
         priority: 'high',
         acceptance_criteria: [
@@ -311,14 +311,14 @@ export class MockGeminiService {
         title: 'Implement User Authentication and Authorization System',
         description: `Create a secure, production-ready authentication system. This includes:
 
-• User registration with email/phone verification
-• Secure login with password hashing (bcrypt/argon2)
-• JWT token-based authentication with refresh tokens
-• Password reset and account recovery flow
-• Role-based access control (RBAC) system
-• Session management and token expiration handling
-• Account security features (2FA support, login history)
-• OAuth integration for social login (Google, GitHub, etc.)`,
+- User registration with email/phone verification
+- Secure login with password hashing (bcrypt/argon2)
+- JWT token-based authentication with refresh tokens
+- Password reset and account recovery flow
+- Role-based access control (RBAC) system
+- Session management and token expiration handling
+- Account security features (2FA support, login history)
+- OAuth integration for social login (Google, GitHub, etc.)`,
         type: 'backend',
         priority: 'high',
         acceptance_criteria: [
@@ -340,14 +340,14 @@ export class MockGeminiService {
         title: 'Develop Core Business Logic and API Endpoints',
         description: `Implement the main functionality and business rules for the application. This includes:
 
-• Create CRUD operations for all main entities
-• Implement business validation rules and workflows
-• Build complex query and filtering capabilities
-• Add pagination, sorting, and search functionality
-• Implement data relationships and cascading operations
-• Create bulk operations for efficiency
-• Add data export and import features
-• Implement audit trails and activity logging`,
+- Create CRUD operations for all main entities
+- Implement business validation rules and workflows
+- Build complex query and filtering capabilities
+- Add pagination, sorting, and search functionality
+- Implement data relationships and cascading operations
+- Create bulk operations for efficiency
+- Add data export and import features
+- Implement audit trails and activity logging`,
         type: 'backend',
         priority: 'high',
         acceptance_criteria: [
@@ -369,14 +369,14 @@ export class MockGeminiService {
         title: 'Build Responsive UI Components and Layout System',
         description: `Create a modern, accessible, and responsive user interface. This includes:
 
-• Design and implement reusable component library
-• Build responsive layout system (mobile, tablet, desktop)
-• Create navigation system (header, sidebar, breadcrumbs)
-• Implement form components with validation
-• Build data display components (tables, cards, lists)
-• Add loading states, skeletons, and empty states
-• Implement modal, drawer, and notification systems
-• Ensure accessibility compliance (WCAG 2.1 AA)`,
+- Design and implement reusable component library
+- Build responsive layout system (mobile, tablet, desktop)
+- Create navigation system (header, sidebar, breadcrumbs)
+- Implement form components with validation
+- Build data display components (tables, cards, lists)
+- Add loading states, skeletons, and empty states
+- Implement modal, drawer, and notification systems
+- Ensure accessibility compliance (WCAG 2.1 AA)`,
         type: 'frontend',
         priority: 'high',
         acceptance_criteria: [
@@ -398,14 +398,14 @@ export class MockGeminiService {
         title: 'Implement State Management and API Integration Layer',
         description: `Set up efficient state management and connect frontend to backend APIs. This includes:
 
-• Configure global state management (Redux/Zustand/Context)
-• Create API client with interceptors and error handling
-• Implement data caching and optimistic updates
-• Set up request/response transformations
-• Add loading and error state management
-• Implement retry logic and offline support
-• Create hooks for data fetching and mutations
-• Add WebSocket support for real-time features (if needed)`,
+- Configure global state management (Redux/Zustand/Context)
+- Create API client with interceptors and error handling
+- Implement data caching and optimistic updates
+- Set up request/response transformations
+- Add loading and error state management
+- Implement retry logic and offline support
+- Create hooks for data fetching and mutations
+- Add WebSocket support for real-time features (if needed)`,
         type: 'frontend',
         priority: 'high',
         acceptance_criteria: [
@@ -427,14 +427,14 @@ export class MockGeminiService {
         title: 'Implement Comprehensive Testing Suite',
         description: `Create automated tests to ensure code quality and reliability. This includes:
 
-• Set up testing framework and test environment
-• Write unit tests for business logic and utilities
-• Create integration tests for API endpoints
-• Implement component tests for UI elements
-• Add end-to-end tests for critical user flows
-• Set up test coverage reporting (aim for 80%+)
-• Implement continuous testing in CI/CD pipeline
-• Create testing documentation and guidelines`,
+- Set up testing framework and test environment
+- Write unit tests for business logic and utilities
+- Create integration tests for API endpoints
+- Implement component tests for UI elements
+- Add end-to-end tests for critical user flows
+- Set up test coverage reporting (aim for 80%+)
+- Implement continuous testing in CI/CD pipeline
+- Create testing documentation and guidelines`,
         type: 'backend',
         priority: 'medium',
         acceptance_criteria: [
@@ -456,14 +456,14 @@ export class MockGeminiService {
         title: 'Implement Security Measures and Performance Optimization',
         description: `Ensure the application is secure and performs efficiently. This includes:
 
-• Implement input validation and sanitization
-• Add rate limiting and DDoS protection
-• Set up CORS policies and security headers
-• Implement SQL injection and XSS prevention
-• Add API request logging and monitoring
-• Optimize database queries and add indexes
-• Implement caching strategy (Redis/memory cache)
-• Perform security audit and penetration testing`,
+- Implement input validation and sanitization
+- Add rate limiting and DDoS protection
+- Set up CORS policies and security headers
+- Implement SQL injection and XSS prevention
+- Add API request logging and monitoring
+- Optimize database queries and add indexes
+- Implement caching strategy (Redis/memory cache)
+- Perform security audit and penetration testing`,
         type: 'backend',
         priority: 'high',
         acceptance_criteria: [
@@ -485,14 +485,14 @@ export class MockGeminiService {
         title: 'Setup CI/CD Pipeline and Production Deployment',
         description: `Prepare the application for production deployment with automated workflows. This includes:
 
-• Configure CI/CD pipeline (GitHub Actions/GitLab CI)
-• Set up automated testing and code quality checks
-• Create Docker containers for easy deployment
-• Configure production environment variables
-• Set up database backup and recovery procedures
-• Implement application monitoring and alerting
-• Configure auto-scaling and load balancing
-• Create deployment documentation and runbooks`,
+- Configure CI/CD pipeline (GitHub Actions/GitLab CI)
+- Set up automated testing and code quality checks
+- Create Docker containers for easy deployment
+- Configure production environment variables
+- Set up database backup and recovery procedures
+- Implement application monitoring and alerting
+- Configure auto-scaling and load balancing
+- Create deployment documentation and runbooks`,
         type: 'backend',
         priority: 'medium',
         acceptance_criteria: [
@@ -1125,13 +1125,13 @@ export const TaskDashboard: React.FC<TaskDashboardProps> = ({
             onClick={() => setViewMode('list')}
             className={\`view-button \${viewMode === 'list' ? 'active' : ''}\`}
           >
-            📋 List
+            [Project] List
           </button>
           <button
             onClick={() => setViewMode('kanban')}
             className={\`view-button \${viewMode === 'kanban' ? 'active' : ''}\`}
           >
-            📊 Kanban
+            [Data] Kanban
           </button>
           <button
             onClick={() => setViewMode('calendar')}

@@ -251,7 +251,7 @@ This project is organized as a full-stack application:
 
 ${hasFrontend ? `- **frontend/** - React + TypeScript + Vite application\n` : ''}${hasBackend ? `- **backend/** - Node.js + Express + TypeScript API server\n` : ''}
 
-## 🚀 Quick Start (Easiest Way)
+## [Starting] Quick Start (Easiest Way)
 
 ### Prerequisites
 - Node.js 18+ installed ([Download here](https://nodejs.org/))
@@ -270,9 +270,9 @@ START.bat
 \`\`\`
 
 That's it! The script will:
-1. ✅ Install all dependencies automatically
-2. ✅ Start both frontend and backend servers
-3. ✅ Open your browser automatically
+1. [Success] Install all dependencies automatically
+2. [Success] Start both frontend and backend servers
+3. [Success] Open your browser automatically
 
 ${hasFrontend ? `Frontend will open at: **http://localhost:5173**\n` : ''}${hasBackend ? `Backend will run at: **http://localhost:3001**\n` : ''}
 
@@ -346,7 +346,7 @@ This project was generated using AI-powered task breakdown and code generation.
 
 ---
 
-**Happy Coding! 🚀**
+**Happy Coding! [Starting]**
 `;
   }
 
@@ -648,7 +648,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(\`🚀 Server running on http://localhost:\${PORT}\`);
+  console.log(\`[Starting] Server running on http://localhost:\${PORT}\`);
 });
 
 export default app;
@@ -706,12 +706,12 @@ npm-debug.log*
   private static generateStartScript(hasFrontend: boolean, hasBackend: boolean): string {
     return `#!/bin/bash
 
-echo "🚀 Starting your application..."
+echo "[Starting] Starting your application..."
 echo ""
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is not installed. Please install Node.js 18+ first."
+    echo "[Error] Node.js is not installed. Please install Node.js 18+ first."
     echo "   Visit: https://nodejs.org/"
     exit 1
 fi
@@ -725,11 +725,11 @@ if [ -d "backend" ]; then
     cd backend
     npm install --silent
     if [ $? -ne 0 ]; then
-        echo "❌ Backend installation failed"
+        echo "[Error] Backend installation failed"
         exit 1
     fi
     cd ..
-    echo "✅ Backend dependencies installed"
+    echo "[Success] Backend dependencies installed"
 fi
 ` : ''}
 ${hasFrontend ? `# Install frontend dependencies
@@ -738,51 +738,51 @@ if [ -d "frontend" ]; then
     cd frontend
     npm install --silent
     if [ $? -ne 0 ]; then
-        echo "❌ Frontend installation failed"
+        echo "[Error] Frontend installation failed"
         exit 1
     fi
     cd ..
-    echo "✅ Frontend dependencies installed"
+    echo "[Success] Frontend dependencies installed"
 fi
 ` : ''}
 echo ""
-echo "✅ All dependencies installed!"
+echo "[Success] All dependencies installed!"
 echo ""
-echo "🚀 Starting servers..."
+echo "[Starting] Starting servers..."
 echo ""
 
 ${hasBackend ? `# Start backend
 if [ -d "backend" ]; then
-    echo "🔧 Starting backend server on http://localhost:3001"
+    echo "[Processing] Starting backend server on http://localhost:3001"
     cd backend
     npm run dev > ../backend.log 2>&1 &
     BACKEND_PID=$!
     cd ..
-    echo "✅ Backend started (PID: $BACKEND_PID)"
+    echo "[Success] Backend started (PID: $BACKEND_PID)"
 fi
 ` : ''}
 ${hasFrontend ? `# Start frontend
 if [ -d "frontend" ]; then
-    echo "🎨 Starting frontend server on http://localhost:5173"
+    echo "[Frontend] Starting frontend server on http://localhost:5173"
     cd frontend
     npm run dev > ../frontend.log 2>&1 &
     FRONTEND_PID=$!
     cd ..
-    echo "✅ Frontend started (PID: $FRONTEND_PID)"
+    echo "[Success] Frontend started (PID: $FRONTEND_PID)"
 fi
 ` : ''}
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 Your application is running!"
+echo "Application is running!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-${hasFrontend ? `echo "🌐 Frontend: http://localhost:5173"` : ''}
-${hasBackend ? `echo "🔧 Backend:  http://localhost:3001"` : ''}
+${hasFrontend ? `echo "Frontend: http://localhost:5173"` : ''}
+${hasBackend ? `echo "Backend:  http://localhost:3001"` : ''}
 echo ""
-echo "📋 Logs:"
+echo "Logs:"
 ${hasFrontend ? `echo "   Frontend: tail -f frontend.log"` : ''}
 ${hasBackend ? `echo "   Backend:  tail -f backend.log"` : ''}
 echo ""
-echo "🛑 To stop: Press Ctrl+C or run ./STOP.sh"
+echo "To stop: Press Ctrl+C or run ./STOP.sh"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -804,13 +804,13 @@ wait
 
   private static generateStartScriptWindows(hasFrontend: boolean, hasBackend: boolean): string {
     return `@echo off
-echo 🚀 Starting your application...
+echo [Starting] Starting your application...
 echo.
 
 REM Check if Node.js is installed
 where node >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo ❌ Node.js is not installed. Please install Node.js 18+ first.
+    echo [Error] Node.js is not installed. Please install Node.js 18+ first.
     echo    Visit: https://nodejs.org/
     pause
     exit /b 1
@@ -825,12 +825,12 @@ if exist "backend" (
     cd backend
     call npm install >nul 2>&1
     if %ERRORLEVEL% NEQ 0 (
-        echo ❌ Backend installation failed
+        echo [Error] Backend installation failed
         pause
         exit /b 1
     )
     cd ..
-    echo ✅ Backend dependencies installed
+    echo [Success] Backend dependencies installed
 )
 ` : ''}
 ${hasFrontend ? `REM Install frontend dependencies
@@ -839,46 +839,46 @@ if exist "frontend" (
     cd frontend
     call npm install >nul 2>&1
     if %ERRORLEVEL% NEQ 0 (
-        echo ❌ Frontend installation failed
+        echo [Error] Frontend installation failed
         pause
         exit /b 1
     )
     cd ..
-    echo ✅ Frontend dependencies installed
+    echo [Success] Frontend dependencies installed
 )
 ` : ''}
 echo.
-echo ✅ All dependencies installed!
+echo [Success] All dependencies installed!
 echo.
-echo 🚀 Starting servers...
+echo [Starting] Starting servers...
 echo.
 
 ${hasBackend ? `REM Start backend
 if exist "backend" (
-    echo 🔧 Starting backend server on http://localhost:3001
+    echo [Processing] Starting backend server on http://localhost:3001
     cd backend
     start "Backend Server" cmd /k "npm run dev"
     cd ..
-    echo ✅ Backend started
+    echo [Success] Backend started
 )
 ` : ''}
 ${hasFrontend ? `REM Start frontend
 if exist "frontend" (
-    echo 🎨 Starting frontend server on http://localhost:5173
+    echo [Frontend] Starting frontend server on http://localhost:5173
     cd frontend
     start "Frontend Server" cmd /k "npm run dev"
     cd ..
-    echo ✅ Frontend started
+    echo [Success] Frontend started
 )
 ` : ''}
 echo.
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-echo 🎉 Your application is running!
+echo Application is running!
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${hasFrontend ? `echo 🌐 Frontend: http://localhost:5173` : ''}
-${hasBackend ? `echo 🔧 Backend:  http://localhost:3001` : ''}
+${hasFrontend ? `echo Frontend: http://localhost:5173` : ''}
+${hasBackend ? `echo Backend:  http://localhost:3001` : ''}
 echo.
-echo 🛑 To stop: Close the terminal windows
+echo To stop: Close the terminal windows
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 echo.
 

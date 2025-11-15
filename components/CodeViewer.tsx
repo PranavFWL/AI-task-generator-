@@ -162,9 +162,14 @@ export default function CodeViewer({ files, projectDescription = 'My Project' }:
         </button>
       </div>
 
-      <div className="flex h-[600px]">
-        {/* File Tree Sidebar */}
-        <div className="w-80 border-r border-slate-200 overflow-y-auto bg-slate-50">
+      <div className="flex flex-col lg:flex-row h-[600px] lg:h-[700px]">
+        {/* File Tree Sidebar - Always visible */}
+        <div className="w-full lg:w-80 lg:max-w-[320px] border-b lg:border-b-0 lg:border-r border-slate-200 overflow-y-auto bg-slate-50 flex-shrink-0 max-h-[300px] lg:max-h-full">
+          <div className="sticky top-0 bg-slate-100 px-4 py-3 border-b border-slate-200 z-10">
+            <h3 className="font-semibold text-slate-900 text-sm">
+              Files ({files.length})
+            </h3>
+          </div>
           <div className="p-4 space-y-4">
             {Object.entries(filesByType).map(([type, typeFiles]) => (
               <div key={type}>
@@ -202,11 +207,11 @@ export default function CodeViewer({ files, projectDescription = 'My Project' }:
         </div>
 
         {/* Code Display */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           {selectedFile ? (
             <>
               {/* File Header */}
-              <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-200 bg-slate-50 flex-wrap gap-2">
                 <div className="flex items-center gap-3">
                   <FileCode className={`w-5 h-5 ${getFileIcon(selectedFile.type)}`} />
                   <div>
@@ -246,8 +251,8 @@ export default function CodeViewer({ files, projectDescription = 'My Project' }:
               </div>
 
               {/* Code Content */}
-              <div className="flex-1 overflow-auto bg-slate-900 p-6">
-                <pre className="text-sm text-slate-100 font-mono leading-relaxed">
+              <div className="flex-1 overflow-auto bg-slate-900 p-4 md:p-6">
+                <pre className="text-xs md:text-sm text-slate-100 font-mono leading-relaxed whitespace-pre-wrap break-words">
                   <code>{selectedFile.content}</code>
                 </pre>
               </div>
